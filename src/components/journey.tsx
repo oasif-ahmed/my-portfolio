@@ -23,6 +23,12 @@ interface JourneyItem {
 
 const journeyData: JourneyItem[] = [
     {
+        title: "B.Sc. in Computer Science",
+        period: "2022 - 2026",
+        description: "Prime University. Graduated with a focus on Software Engineering and Artificial Intelligence. Participated in multiple hackathons and led the university programming club.",
+        icons: [Book, Award, Terminal]
+    },
+    {
         title: "Exploration Phase",
         period: "2022 - 2023",
         description: "Started my coding journey by exploring the fundamentals. Mastered core languages and began building static and dynamic web interfaces while learning the basics of containerization and databases.",

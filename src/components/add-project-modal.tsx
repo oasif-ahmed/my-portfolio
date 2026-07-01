@@ -28,6 +28,8 @@ export interface CustomProject {
     images: string[]; // base64 strings
     liveLink: string;
     repoLink: string;
+    challenges?: string;
+    futurePlans?: string;
 }
 
 interface AddProjectModalProps {

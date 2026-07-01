@@ -14,7 +14,7 @@ import { ProjectHoverList } from "@/components/project-hover-list";
 import { AddProjectCard, AddProjectModal, CustomProject } from "@/components/add-project-modal";
 import { GsapReveal, GsapParallax } from "@/components/gsap-reveal";
 
-import { Mail, Copy, Github, Linkedin, Twitter } from "lucide-react";
+import { Mail, Copy, Github, Linkedin, Twitter, Phone, MessageCircle } from "lucide-react";
 import { getProjects, addProject, updateProject, deleteProject } from "@/actions/projects";
 
 const STORAGE_KEY = "portfolio-custom-projects";
@@ -34,6 +34,8 @@ const defaultProjects = [
     ],
     liveLink: "https://local-chef-bazaar-client.vercel.app/",
     repoLink: "https://github.com/oasif-ahmed/local-chef-bazaar-client?tab=readme-ov-file",
+    challenges: "[Please describe the challenges faced while developing Local Chef Bazaar]",
+    futurePlans: "[Please describe potential improvements and future plans for Local Chef Bazaar]",
   },
   {
     title: "My Tools",
@@ -49,6 +51,8 @@ const defaultProjects = [
     ],
     liveLink: "https://peoject-my-tools.vercel.app/",
     repoLink: "https://github.com/oasif-ahmed/peoject-myTools?tab=readme-ov-file",
+    challenges: "[Please describe the challenges faced while developing My Tools]",
+    futurePlans: "[Please describe potential improvements and future plans for My Tools]",
   },
   {
     title: "Hero.io",
@@ -62,6 +66,9 @@ const defaultProjects = [
       "/projects/hero-io-3.png",
     ],
     liveLink: "https://scintillating-parfait-b3d78e.netlify.app",
+    repoLink: "https://github.com/oasif-ahmed/hero-io",
+    challenges: "[Please describe the challenges faced while developing Hero.io]",
+    futurePlans: "[Please describe potential improvements and future plans for Hero.io]",
   },
 
 ];
@@ -224,6 +231,7 @@ export default function Home() {
       <Navbar onAddProject={() => handleAuthTrigger({ type: "ADD" })} />
 
       <Hero />
+      
       <TechMarquee />
 
       <SkillsGrid />
@@ -348,7 +356,7 @@ export default function Home() {
                   }}
                 >
                   <Image
-                    src="/profile-bg.png"
+                    src="/profile.png"
                     alt="Oasif Ahmed Rikto"
                     width={400}
                     height={400}
@@ -439,6 +447,12 @@ export default function Home() {
                 </a>
                 <a href="#" className="p-3 rounded-full glass text-muted hover:text-[#1DA1F2] transition-all duration-300 group">
                   <Twitter className="w-6 h-6 group-hover:scale-110 transition-transform" />
+                </a>
+                <a href="tel:+8801734449965" title="Call Me" className="p-3 rounded-full glass text-muted hover:text-green-500 transition-all duration-300 group">
+                  <Phone className="w-6 h-6 group-hover:scale-110 transition-transform" />
+                </a>
+                <a href="https://wa.me/8801734449965" target="_blank" rel="noopener noreferrer" title="WhatsApp" className="p-3 rounded-full glass text-muted hover:text-green-400 transition-all duration-300 group">
+                  <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
                 </a>
               </div>
             </div>

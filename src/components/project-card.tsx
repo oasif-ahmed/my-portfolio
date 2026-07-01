@@ -332,6 +332,27 @@ export function ProjectCard({ title, description, tags, status, images, liveLink
                                             </div>
                                         </div>
 
+                                        {(project.challenges || project.futurePlans) && (
+                                            <div className="grid grid-cols-1 gap-8 mb-10 text-left" onClick={(e) => e.stopPropagation()}>
+                                                {project.challenges && (
+                                                    <div className="p-6 rounded-2xl bg-foreground/[0.03] border border-border">
+                                                        <h4 className="text-sm font-bold uppercase tracking-widest text-foreground mb-3 flex items-center gap-2">
+                                                            <div className="w-1.5 h-1.5 rounded-full bg-red-500/80" /> Challenges Faced
+                                                        </h4>
+                                                        <p className="text-muted leading-relaxed text-sm">{project.challenges}</p>
+                                                    </div>
+                                                )}
+                                                {project.futurePlans && (
+                                                    <div className="p-6 rounded-2xl bg-foreground/[0.03] border border-border">
+                                                        <h4 className="text-sm font-bold uppercase tracking-widest text-foreground mb-3 flex items-center gap-2">
+                                                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500/80" /> Future Plans
+                                                        </h4>
+                                                        <p className="text-muted leading-relaxed text-sm">{project.futurePlans}</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+
                                         <div
                                             className="flex flex-col sm:flex-row items-center gap-4 mt-auto"
                                             onClick={(e) => e.stopPropagation()}
