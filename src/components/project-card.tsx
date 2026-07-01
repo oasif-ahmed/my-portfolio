@@ -18,7 +18,7 @@ interface ProjectCardProps {
     onDelete?: () => void;
 }
 
-const MotionImage = motion(Image);
+const MotionImage = motion.create(Image);
 
 export function ProjectCard({ title, description, tags, status, images, liveLink, repoLink, onEdit, onDelete }: ProjectCardProps) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);

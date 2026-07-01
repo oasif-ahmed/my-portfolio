@@ -183,7 +183,7 @@ export function Hero() {
                         Connect now <ArrowUpRight size={20} />
                     </motion.a>
                     <motion.a
-                        href="https://github.com/ahmed0004321"
+                        href="https://github.com/oasif-ahmed"
                         target="_blank"
                         rel="noopener noreferrer"
                         whileHover={{ scale: 1.05, y: -2 }}

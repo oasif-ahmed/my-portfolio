@@ -37,8 +37,11 @@ export function DotBackground() {
         const draw = () => {
             ctx.clearRect(0, 0, width, height);
 
-            const isLight = resolvedTheme === "light";
-            const dotBaseColor = isLight ? "0, 0, 0" : "255, 255, 255";
+            let dotBaseColor = "0, 0, 0";
+            if (resolvedTheme === "dark") dotBaseColor = "255, 255, 255";
+            if (resolvedTheme === "cream") dotBaseColor = "58, 50, 44";
+
+            const isDark = resolvedTheme === "dark";
 
             const cols = Math.ceil(width / dotSpacing);
             const rows = Math.ceil(height / dotSpacing);
@@ -53,12 +56,12 @@ export function DotBackground() {
                     const distance = Math.sqrt(dx * dx + dy * dy);
 
                     let currentRadius = dotRadius;
-                    let opacity = isLight ? 0.1 : 0.15;
+                    let opacity = isDark ? 0.15 : 0.1;
 
                     if (distance < mouseRadius) {
                         const factor = 1 - distance / mouseRadius;
                         currentRadius = dotRadius + factor * 2;
-                        opacity = (isLight ? 0.1 : 0.15) + factor * 0.4;
+                        opacity = (isDark ? 0.15 : 0.1) + factor * 0.4;
                     }
 
                     ctx.beginPath();

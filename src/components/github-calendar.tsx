@@ -15,8 +15,13 @@ export function GithubCalendar() {
         setMounted(true);
     }, []);
 
+    const isDark = resolvedTheme === "dark";
+    const colorScheme = isDark ? "dark" : "light";
+
     const calendarTheme = {
-        light: ["#f0f0f0", "#c6e48b", "#7bc96f", "#239a3b", "#196127"],
+        light: resolvedTheme === "cream" 
+            ? ["#efeadb", "#c6e48b", "#7bc96f", "#239a3b", "#196127"]
+            : ["#f0f0f0", "#c6e48b", "#7bc96f", "#239a3b", "#196127"],
         dark: ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"],
     };
 
@@ -38,11 +43,11 @@ export function GithubCalendar() {
                         {mounted ? (
                             <>
                                 <GitHubCalendar 
-                                    username="ahmed0004321" 
+                                    username="oasif-ahmed" 
                                     blockSize={14}
                                     blockMargin={6}
                                     fontSize={14}
-                                    colorScheme={resolvedTheme as "light" | "dark"}
+                                    colorScheme={colorScheme}
                                     theme={calendarTheme}
                                     renderBlock={(block, activity) =>
                                         React.cloneElement(block, {
@@ -86,7 +91,7 @@ export function GithubCalendar() {
                         </div>
                         
                         <a 
-                            href="https://github.com/ahmed0004321" 
+                            href="https://github.com/oasif-ahmed" 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="text-sm font-bold text-foreground hover:opacity-70 transition-opacity flex items-center gap-2"

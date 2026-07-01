@@ -10,9 +10,10 @@ import { TechMarquee } from "@/components/tech-marquee";
 import { SkillsGrid } from "@/components/skills-grid";
 import { Journey } from "@/components/journey";
 import { GithubCalendar } from "@/components/github-calendar";
-import { ProjectMarquee } from "@/components/project-marquee";
+import { ProjectHoverList } from "@/components/project-hover-list";
 import { AddProjectCard, AddProjectModal, CustomProject } from "@/components/add-project-modal";
 import { GsapReveal, GsapParallax } from "@/components/gsap-reveal";
+
 import { Mail, Copy, Github, Linkedin, Twitter } from "lucide-react";
 import { getProjects, addProject, updateProject, deleteProject } from "@/actions/projects";
 
@@ -32,7 +33,7 @@ const defaultProjects = [
       "/projects/chef-5.png",
     ],
     liveLink: "https://local-chef-bazaar-client.vercel.app/",
-    repoLink: "https://github.com/ahmed0004321/local-chef-bazaar-client?tab=readme-ov-file",
+    repoLink: "https://github.com/oasif-ahmed/local-chef-bazaar-client?tab=readme-ov-file",
   },
   {
     title: "My Tools",
@@ -47,7 +48,7 @@ const defaultProjects = [
       "/projects/mytools-5.png",
     ],
     liveLink: "https://peoject-my-tools.vercel.app/",
-    repoLink: "https://github.com/ahmed0004321/peoject-myTools?tab=readme-ov-file",
+    repoLink: "https://github.com/oasif-ahmed/peoject-myTools?tab=readme-ov-file",
   },
   {
     title: "Hero.io",
@@ -243,7 +244,7 @@ export default function Home() {
         </div>
 
         <GsapReveal delay={0.2}>
-          <ProjectMarquee
+          <ProjectHoverList
             projects={customProjects}
             onEdit={(project) => handleAuthTrigger({ type: "EDIT", project })}
             onDelete={(id) => handleAuthTrigger({ type: "DELETE", id })}
@@ -389,6 +390,8 @@ export default function Home() {
         </div>
       </section>
 
+
+
       {/* Contact CTA */}
       <GsapReveal>
         <section id="contact" className="py-24 px-6 max-w-4xl mx-auto">
@@ -428,7 +431,7 @@ export default function Home() {
 
               {/* Social Links inside the card */}
               <div className="flex items-center gap-6 justify-center">
-                <a href="https://github.com/ahmed0004321" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full glass text-muted hover:text-foreground transition-all duration-300 group">
+                <a href="https://github.com/oasif-ahmed" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full glass text-muted hover:text-foreground transition-all duration-300 group">
                   <Github className="w-6 h-6 group-hover:scale-110 transition-transform" />
                 </a>
                 <a href="https://www.linkedin.com/in/oasif-ahmed-rikto-30610b354/" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full glass text-muted hover:text-[#0A66C2] transition-all duration-300 group">

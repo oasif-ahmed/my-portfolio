@@ -1,104 +1,269 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { motion, useMotionValue, useSpring, useTransform, useInView } from "framer-motion";
-import { GsapStaggerReveal } from "./gsap-reveal";
+import React, { useRef, useCallback, useState, useEffect, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import gsap from "gsap";
+import { GsapReveal } from "./gsap-reveal";
 import {
     SiReact, SiNextdotjs, SiTypescript, SiJavascript, SiNodedotjs,
     SiExpress, SiMongodb, SiPostgresql, SiTailwindcss,
-    SiDocker, SiFigma, SiPython, SiFirebase, SiJsonwebtokens
+    SiDocker, SiFigma, SiPython, SiFirebase, SiJsonwebtokens,
+    SiGit, SiHtml5, SiCss3, SiCplusplus, SiFramer, SiVite
 } from "react-icons/si";
+import { IconType } from "react-icons";
 
-const skills = [
-    { name: "React", category: "Frontend", icon: SiReact, level: 90 },
-    { name: "Next.js", category: "Frontend", icon: SiNextdotjs, level: 85 },
-    { name: "JavaScript", category: "Language", icon: SiJavascript, level: 85 },
-    { name: "TypeScript", category: "Language", icon: SiTypescript, level: 80 },
-    { name: "Node.js", category: "Backend", icon: SiNodedotjs, level: 75 },
-    { name: "Express", category: "Backend", icon: SiExpress, level: 80 },
-    { name: "MongoDB", category: "Database", icon: SiMongodb, level: 70 },
-    { name: "PostgreSQL", category: "Database", icon: SiPostgresql, level: 65 },
-    { name: "Tailwind CSS", category: "Styling", icon: SiTailwindcss, level: 95 },
-    { name: "Docker", category: "DevOps", icon: SiDocker, level: 60 },
-    { name: "Figma", category: "Design", icon: SiFigma, level: 70 },
-    { name: "Python", category: "Language", icon: SiPython, level: 80 },
-    { name: "Firebase", category: "Backend", icon: SiFirebase, level: 75 },
-    { name: "JWT", category: "Security", icon: SiJsonwebtokens, level: 90 },
-];
-
-function Counter({ value, className }: { value: number, className?: string }) {
-    const motionValue = useMotionValue(0);
-    const springValue = useSpring(motionValue, {
-        damping: 30,
-        stiffness: 100,
-    });
-    const displayValue = useTransform(springValue, (latest) => Math.round(latest));
-    const ref = React.useRef(null);
-    const isInView = useInView(ref, { once: true, margin: "-50px" });
-
-    useEffect(() => {
-        if (isInView) {
-            motionValue.set(value);
-        }
-    }, [isInView, value, motionValue]);
-
-    return (
-        <span ref={ref} className={className}>
-            <motion.span>{displayValue}</motion.span>%
-        </span>
-    );
+interface Skill {
+    name: string;
+    icon: IconType;
+    level: number;
 }
 
+const skills: Skill[] = [
+    // Row 0 — 4 icons
+    { name: "HTML5", icon: SiHtml5, level: 95 },
+    { name: "CSS3", icon: SiCss3, level: 90 },
+    { name: "JavaScript", icon: SiJavascript, level: 85 },
+    { name: "TypeScript", icon: SiTypescript, level: 80 },
+    // Row 1 — 5 icons
+    { name: "React", icon: SiReact, level: 90 },
+    { name: "Next.js", icon: SiNextdotjs, level: 85 },
+    { name: "Tailwind CSS", icon: SiTailwindcss, level: 95 },
+    { name: "Framer Motion", icon: SiFramer, level: 75 },
+    { name: "Vite", icon: SiVite, level: 80 },
+    // Row 2 — 6 icons (widest)
+    { name: "Node.js", icon: SiNodedotjs, level: 75 },
+    { name: "Express", icon: SiExpress, level: 80 },
+    { name: "MongoDB", icon: SiMongodb, level: 70 },
+    { name: "PostgreSQL", icon: SiPostgresql, level: 65 },
+    { name: "Firebase", icon: SiFirebase, level: 75 },
+    { name: "JWT", icon: SiJsonwebtokens, level: 90 },
+    // Row 3 — 5 icons
+    { name: "Python", icon: SiPython, level: 80 },
+    { name: "C++", icon: SiCplusplus, level: 70 },
+    { name: "Docker", icon: SiDocker, level: 60 },
+    { name: "Git", icon: SiGit, level: 85 },
+    { name: "Figma", icon: SiFigma, level: 70 },
+];
+
+// ─── Apple Watch Diamond Honeycomb ─────────────────────────────────
+// Widest in the middle, tapers at top and bottom → fills horizontal space
+const HONEYCOMB_ROWS = [4, 5, 6, 5];
+
+// ─── Fisheye Config ────────────────────────────────────────────────
+const INFLUENCE_RADIUS = 200;
+const MAX_SCALE = 1.65;
+const SHRINK_SCALE = 0.88;
+const PUSH_STRENGTH = 15;
+
+function computeHoneycombPositions() {
+    const positions: { unitX: number; unitY: number }[] = [];
+    const totalRows = HONEYCOMB_ROWS.length;
+
+    HONEYCOMB_ROWS.forEach((count, rowIdx) => {
+        for (let col = 0; col < count; col++) {
+            positions.push({
+                unitX: col - (count - 1) / 2,
+                unitY: rowIdx - (totalRows - 1) / 2,
+            });
+        }
+    });
+
+    return positions;
+}
+
+const GRID_POSITIONS = computeHoneycombPositions();
+
 export function SkillsGrid() {
+    const positionRefs = useRef<(HTMLDivElement | null)[]>([]);
+    const animateRefs = useRef<(HTMLDivElement | null)[]>([]);
+    const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+
+    const [dims, setDims] = useState({ cellW: 108, cellH: 95, iconSize: 84 });
+
+    useEffect(() => {
+        const update = () => {
+            if (window.innerWidth < 640) {
+                setDims({ cellW: 72, cellH: 65, iconSize: 56 });
+            } else if (window.innerWidth < 768) {
+                setDims({ cellW: 88, cellH: 78, iconSize: 68 });
+            } else {
+                setDims({ cellW: 108, cellH: 95, iconSize: 84 });
+            }
+        };
+        update();
+        window.addEventListener("resize", update);
+        return () => window.removeEventListener("resize", update);
+    }, []);
+
+    const containerHeight = useMemo(() => {
+        const maxRowIdx = (HONEYCOMB_ROWS.length - 1) / 2;
+        return Math.ceil(maxRowIdx * 2 * dims.cellH + dims.iconSize + 80);
+    }, [dims]);
+
+    // ─── Fisheye engine ────────────────────────────────────────────
+    const handleMouseMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+        const point = "touches" in e ? e.touches[0] : (e as React.MouseEvent);
+        if (!point) return;
+        const mx = point.clientX;
+        const my = point.clientY;
+
+        positionRefs.current.forEach((posEl, i) => {
+            const animEl = animateRefs.current[i];
+            if (!posEl || !animEl) return;
+
+            const rect = posEl.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            const dx = mx - cx;
+            const dy = my - cy;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            let targetScale: number;
+            let targetX = 0;
+            let targetY = 0;
+
+            if (dist < INFLUENCE_RADIUS) {
+                const ratio = dist / INFLUENCE_RADIUS;
+                const intensity = 0.5 + 0.5 * Math.cos(Math.PI * ratio);
+                targetScale = 1 + (MAX_SCALE - 1) * intensity;
+
+                if (dist > 2) {
+                    const pushForce = intensity * PUSH_STRENGTH;
+                    targetX = -(dx / dist) * pushForce;
+                    targetY = -(dy / dist) * pushForce;
+                }
+            } else {
+                targetScale = SHRINK_SCALE;
+            }
+
+            gsap.to(animEl, {
+                scale: targetScale,
+                x: targetX,
+                y: targetY,
+                duration: 0.35,
+                ease: "power3.out",
+                overwrite: "auto",
+            });
+        });
+    }, []);
+
+    const handleMouseLeave = useCallback(() => {
+        setHoveredIdx(null);
+        animateRefs.current.forEach((el) => {
+            if (!el) return;
+            gsap.to(el, {
+                scale: 1,
+                x: 0,
+                y: 0,
+                duration: 0.6,
+                ease: "elastic.out(1, 0.4)",
+                overwrite: "auto",
+            });
+        });
+    }, []);
+
     return (
         <section id="skills" className="py-24 px-6 max-w-6xl mx-auto">
-            <div className="flex items-center gap-4 mb-12">
-                <span className="text-2xl opacity-50 font-mono">{">_"}</span>
-                <h2 className="text-3xl font-bold tracking-tight">The Secret Sauce</h2>
-            </div>
+            <GsapReveal>
+                <div className="flex items-center gap-4 mb-16">
+                    <span className="text-2xl opacity-50 font-mono">{">_"}</span>
+                    <h2 className="text-3xl font-bold tracking-tight">The Secret Sauce</h2>
+                </div>
+            </GsapReveal>
 
-            <GsapStaggerReveal className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" staggerAmount={0.06}>
-                {skills.map((skill) => (
-                    <motion.div
-                        key={skill.name}
-                        whileHover={{
-                            y: -8,
-                            scale: 1.02,
-                            boxShadow: "0 20px 40px -12px rgba(0,0,0,0.3)"
-                        }}
-                        transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                        className="glass-card p-6 rounded-2xl group cursor-default relative overflow-hidden flex flex-col gap-4"
-                    >
-                        {/* Subtle inner glow on hover */}
-                        <div className="absolute inset-0 bg-foreground/[0.02] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            <GsapReveal delay={0.15}>
+                <div
+                    onMouseMove={handleMouseMove}
+                    onMouseLeave={handleMouseLeave}
+                    onTouchMove={handleMouseMove}
+                    onTouchEnd={handleMouseLeave}
+                    className="relative mx-auto w-full overflow-visible"
+                    style={{ height: `${containerHeight}px` }}
+                >
+                    {/* ── Ambient side glows ── */}
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/3 w-56 h-56 rounded-full bg-foreground/[0.02] blur-[80px] pointer-events-none" />
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/3 w-56 h-56 rounded-full bg-foreground/[0.02] blur-[80px] pointer-events-none" />
+                    <div className="absolute left-[8%] top-[20%] w-32 h-32 rounded-full bg-foreground/[0.015] blur-[60px] pointer-events-none" />
+                    <div className="absolute right-[8%] bottom-[20%] w-32 h-32 rounded-full bg-foreground/[0.015] blur-[60px] pointer-events-none" />
 
-                        <div className="flex items-center gap-4 relative z-10 text-muted group-hover:text-foreground transition-colors duration-500">
-                            <skill.icon className="w-8 h-8 group-hover:scale-110 transition-transform duration-500 ease-out" />
-                            <div className="flex-1">
-                                <span className="text-xs uppercase tracking-widest opacity-50 block mb-0.5">{skill.category}</span>
-                                <h3 className="text-base font-bold tracking-tight">
-                                    {skill.name}
-                                </h3>
+                    {/* ── Decorative ghost dots on sides ── */}
+                    {[...Array(6)].map((_, i) => (
+                        <div
+                            key={`dot-l-${i}`}
+                            className="absolute w-2 h-2 rounded-full bg-foreground/[0.04] pointer-events-none hidden md:block"
+                            style={{
+                                left: `${4 + i * 3}%`,
+                                top: `${20 + (i % 3) * 25}%`,
+                            }}
+                        />
+                    ))}
+                    {[...Array(6)].map((_, i) => (
+                        <div
+                            key={`dot-r-${i}`}
+                            className="absolute w-2 h-2 rounded-full bg-foreground/[0.04] pointer-events-none hidden md:block"
+                            style={{
+                                right: `${4 + i * 3}%`,
+                                top: `${15 + (i % 3) * 25}%`,
+                            }}
+                        />
+                    ))}
+
+                    {/* ── Honeycomb icons ── */}
+                    {GRID_POSITIONS.map((pos, i) => {
+                        const skill = skills[i];
+                        if (!skill) return null;
+
+                        const IconComponent = skill.icon;
+                        const isHovered = hoveredIdx === i;
+
+                        const px = pos.unitX * dims.cellW;
+                        const py = pos.unitY * dims.cellH;
+                        const half = dims.iconSize / 2;
+
+                        return (
+                            <div
+                                key={skill.name}
+                                ref={(el) => { positionRefs.current[i] = el; }}
+                                className="absolute"
+                                style={{
+                                    left: `calc(50% + ${px}px - ${half}px)`,
+                                    top: `calc(50% + ${py}px - ${half}px)`,
+                                    width: `${dims.iconSize}px`,
+                                    height: `${dims.iconSize}px`,
+                                }}
+                            >
+                                <div
+                                    ref={(el) => { animateRefs.current[i] = el; }}
+                                    onMouseEnter={() => setHoveredIdx(i)}
+                                    onMouseLeave={() => setHoveredIdx(null)}
+                                    className="relative w-full h-full cursor-pointer will-change-transform"
+                                    style={{ zIndex: isHovered ? 20 : 1 }}
+                                >
+                                    <div className="w-full h-full rounded-[20px] sm:rounded-[24px] glass-card border border-border/40 bg-foreground/[0.03] flex items-center justify-center shadow-lg hover:bg-foreground/[0.06] transition-colors duration-300">
+                                        <IconComponent className="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 text-muted hover:text-foreground transition-colors duration-300" />
+                                    </div>
+
+                                    <AnimatePresence>
+                                        {isHovered && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 8, scale: 0.85 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                exit={{ opacity: 0, y: 6, scale: 0.9 }}
+                                                transition={{ duration: 0.15, ease: "easeOut" }}
+                                                className="absolute left-1/2 -translate-x-1/2 -bottom-9 z-50 px-3 py-1.5 rounded-lg bg-background/95 backdrop-blur-md border border-border/50 shadow-xl whitespace-nowrap pointer-events-none"
+                                            >
+                                                <span className="text-[11px] font-bold tracking-tight text-foreground">
+                                                    {skill.name}
+                                                </span>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
                             </div>
-                            <Counter 
-                                value={skill.level} 
-                                className="text-sm font-mono opacity-50 group-hover:opacity-100 transition-opacity whitespace-nowrap"
-                            />
-                        </div>
-
-                        {/* Progress Bar Container */}
-                        <div className="w-full h-1.5 bg-foreground/5 rounded-full overflow-hidden relative z-10">
-                            <motion.div
-                                initial={{ width: 0 }}
-                                whileInView={{ width: `${skill.level}%` }}
-                                viewport={{ once: true, margin: "-50px" }}
-                                transition={{ duration: 1.5, ease: "easeOut", delay: 0.2 }}
-                                className="h-full bg-foreground/30 group-hover:bg-foreground/50 transition-colors duration-500 rounded-full"
-                            />
-                        </div>
-                    </motion.div>
-                ))}
-            </GsapStaggerReveal>
+                        );
+                    })}
+                </div>
+            </GsapReveal>
         </section>
     );
 }
