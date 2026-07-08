@@ -66,7 +66,7 @@ const defaultJourneyData: JourneyItem[] = defaultJourneyRaw.map((item) => ({
 export function Journey() {
     const containerRef = useRef<HTMLDivElement>(null);
     const lineRef = useRef<HTMLDivElement>(null);
-    const [journeyData, setJourneyData] = useState<JourneyItem[]>(defaultJourneyData);
+    const [journeyData, setJourneyData] = useState<JourneyItem[] | null>(null);
 
     useEffect(() => {
         const load = async () => {
@@ -162,7 +162,9 @@ export function Journey() {
                 />
 
                 <div className="space-y-16 md:space-y-24">
-                    {journeyData.map((item, index) => {
+                    {!journeyData ? (
+                        <div className="flex items-center justify-center py-24 text-muted/40 text-sm">Loading journey...</div>
+                    ) : journeyData.map((item, index) => {
                         const isEven = index % 2 === 0;
                         return (
                             <div key={index} className="journey-item relative flex items-center justify-between w-full group">

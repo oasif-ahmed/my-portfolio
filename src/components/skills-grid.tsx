@@ -85,7 +85,7 @@ export function SkillsGrid() {
     const positionRefs = useRef<(HTMLDivElement | null)[]>([]);
     const animateRefs = useRef<(HTMLDivElement | null)[]>([]);
     const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-    const [skills, setSkills] = useState<Skill[]>(defaultSkills);
+    const [skills, setSkills] = useState<Skill[] | null>(null);
 
     useEffect(() => {
         const load = async () => {
@@ -93,7 +93,7 @@ export function SkillsGrid() {
             if (data && data.length > 0) {
                 setSkills(data.map((s) => ({
                     name: s.name,
-                    icon: getIcon(s.icon) || defaultSkills.find(d => d.name === s.name)?.icon || getIcon("SiReact")!,
+                    icon: getIcon(s.icon) || getIcon("SiReact")!,
                     level: s.level,
                 })));
             } else {
@@ -110,7 +110,7 @@ export function SkillsGrid() {
 
     const [dims, setDims] = useState({ cellW: 108, cellH: 95, iconSize: 84 });
 
-    const honeycombRows = useMemo(() => computeHoneycombRows(skills.length), [skills]);
+    const honeycombRows = useMemo(() => computeHoneycombRows(skills?.length ?? 0), [skills]);
     const gridPositions = useMemo(() => computeHoneycombPositions(honeycombRows), [honeycombRows]);
 
     useEffect(() => {
@@ -206,6 +206,9 @@ export function SkillsGrid() {
             </GsapReveal>
 
             <GsapReveal delay={0.15}>
+                {!skills ? (
+                    <div className="flex items-center justify-center py-24 text-muted/40 text-sm">Loading skills...</div>
+                ) : (
                 <div
                     onMouseMove={handleMouseMove}
                     onMouseLeave={handleMouseLeave}
@@ -297,6 +300,7 @@ export function SkillsGrid() {
                         );
                     })}
                 </div>
+                )}
             </GsapReveal>
         </section>
     );
