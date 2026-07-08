@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Plus, X, Save, Trash2, Edit3, Sparkles, GripVertical } from "lucide-react";
 import { getJourney, addJourneyItem, updateJourneyItem, deleteJourneyItem, JourneyItem } from "@/actions/journey";
 import { getIcon, ALL_ICON_NAMES } from "@/lib/icons";
+import { BulgeText } from "@/components/bulge-text";
 
 export function JourneyManager() {
   const [items, setItems] = useState<JourneyItem[]>([]);
@@ -93,7 +94,7 @@ export function JourneyManager() {
           onClick={() => { resetForm(); setShowForm(true); }}
           className="px-4 py-2 rounded-xl bg-foreground text-background text-sm font-bold flex items-center gap-2 hover:scale-[1.02] transition-transform"
         >
-          <Plus size={16} /> Add Entry
+          <Plus size={16} /> <BulgeText text="Add Entry" />
         </button>
       </div>
 
@@ -165,10 +166,10 @@ export function JourneyManager() {
 
               <div className="flex gap-3 pt-2">
                 <button onClick={resetForm} className="flex-1 py-2.5 rounded-xl border border-border text-sm font-semibold text-muted hover:text-foreground transition-colors">
-                  Cancel
+                  <BulgeText text="Cancel" />
                 </button>
                 <button onClick={handleSave} className="flex-1 py-2.5 rounded-xl bg-foreground text-background text-sm font-bold flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform">
-                  <Save size={14} /> {editingId ? "Update" : "Save"}
+                  <Save size={14} /> <BulgeText text={editingId ? "Update" : "Save"} />
                 </button>
               </div>
             </div>

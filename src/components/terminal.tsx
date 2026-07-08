@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, User, Sparkles, Command, HelpCircle } from "lucide-react";
+import { BulgeText } from "@/components/bulge-text";
 
 const RESPONSES = {
     help: "I can help you navigate Oasif's profile. Try asking about: **Whoami**, **Skills**, **Projects**, or **Contact**.",
@@ -145,7 +146,7 @@ export function InteractiveTerminal() {
                                 }}
                                 className="px-3 py-1 rounded-full border border-white/5 text-[10px] font-bold uppercase tracking-widest text-muted hover:text-foreground hover:bg-white/5 transition-all"
                             >
-                                {s}
+                                <BulgeText text={s} />
                             </button>
                         ))}
                     </div>

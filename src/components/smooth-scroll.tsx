@@ -55,12 +55,12 @@ export function SmoothScroll({ children }: SmoothScrollProps) {
     <ReactLenis
       root
       options={{
-        lerp: 0.07, // lowered from 0.1 for more premium fluid inertia
-        wheelMultiplier: 1.15, // provides slightly more effortless scroll distance
+        lerp: 0.04,
+        wheelMultiplier: 1.3,
         orientation: "vertical",
         gestureOrientation: "vertical",
         smoothWheel: true,
-        autoRaf: false, // disable internal RAF to let GSAP's ticker manage it
+        autoRaf: false,
       }}
     >
       <SmoothScrollInner>{children}</SmoothScrollInner>

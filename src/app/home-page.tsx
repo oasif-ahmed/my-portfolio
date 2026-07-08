@@ -11,6 +11,8 @@ import { Journey } from "@/components/journey";
 import { GithubCalendar } from "@/components/github-calendar";
 import { ProjectHoverList } from "@/components/project-hover-list";
 import { GsapReveal } from "@/components/gsap-reveal";
+import { CertificatesCarousel } from "@/components/certificates-carousel";
+import { BulgeText } from "@/components/bulge-text";
 
 import { Mail, Copy, Github, Linkedin, Twitter, Phone, MessageCircle } from "lucide-react";
 import { getProjects, addProject } from "@/actions/projects";
@@ -68,9 +70,10 @@ const defaultProjects = [
 interface HomePageProps {
   initialSkills?: { name: string; icon: string; level: number }[];
   initialJourney?: { title: string; period: string; description: string; highlights?: string[]; icons: string[] }[];
+  initialCertificates?: { title: string; issuer: string; date: string; image: string; credentialUrl?: string }[];
 }
 
-export default function Home({ initialSkills, initialJourney }: HomePageProps) {
+export default function Home({ initialSkills, initialJourney, initialCertificates }: HomePageProps) {
   const router = useRouter();
   const [customProjects, setCustomProjects] = useState<any[]>([]);
 
@@ -170,6 +173,10 @@ export default function Home({ initialSkills, initialJourney }: HomePageProps) {
         </GsapReveal>
       </section>
 
+      {initialCertificates && initialCertificates.length > 0 && (
+        <CertificatesCarousel certificates={initialCertificates} />
+      )}
+
       {/* About Section */}
       <section id="about" className="py-24 px-6 max-w-6xl mx-auto overflow-hidden">
         <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16">
@@ -218,7 +225,7 @@ export default function Home({ initialSkills, initialJourney }: HomePageProps) {
 
                 <button className="px-8 py-3 rounded-full bg-foreground text-background font-bold hover:opacity-90 transition-opacity flex items-center gap-2">
                   <a href='https://drive.google.com/file/d/1u1eJkYcgpB14Nss5f-SOgRH9sSQ3frOy/view?usp=drive_link' target="_blank" rel="noopener noreferrer">
-                    Resume
+                    <BulgeText text="Resume" />
                   </a>
                 </button>
               </div>
@@ -252,7 +259,7 @@ export default function Home({ initialSkills, initialJourney }: HomePageProps) {
                   className="w-full sm:w-auto px-8 py-4 rounded-full bg-foreground text-background font-bold hover:scale-105 transition-transform flex items-center justify-center gap-2 group"
                 >
                   <Mail className="w-5 h-5 group-hover:animate-bounce" />
-                  Say Hello
+                  <BulgeText text="Say Hello" />
                 </a>
                 <button
                   onClick={() => {
@@ -262,7 +269,7 @@ export default function Home({ initialSkills, initialJourney }: HomePageProps) {
                   className="w-full sm:w-auto px-8 py-4 rounded-full glass font-semibold hover:bg-foreground/5 transition-colors flex items-center justify-center gap-2 group"
                 >
                   <Copy className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                  Copy Email
+                  <BulgeText text="Copy Email" />
                 </button>
               </div>
 

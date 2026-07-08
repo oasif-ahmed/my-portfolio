@@ -3,17 +3,19 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Code2, MapPin, FolderKanban } from "lucide-react";
+import { ArrowLeft, Code2, MapPin, FolderKanban, Award } from "lucide-react";
 import { SkillsManager } from "@/components/dashboard/skills-manager";
 import { JourneyManager } from "@/components/dashboard/journey-manager";
 import { ProjectsManager } from "@/components/dashboard/projects-manager";
+import { CertificatesManager } from "@/components/dashboard/certificates-manager";
 
-type Tab = "skills" | "journey" | "projects";
+type Tab = "skills" | "journey" | "projects" | "certificates";
 
 const tabs: { key: Tab; label: string; icon: React.ElementType }[] = [
   { key: "skills", label: "Skills", icon: Code2 },
   { key: "journey", label: "Journey", icon: MapPin },
   { key: "projects", label: "Projects", icon: FolderKanban },
+  { key: "certificates", label: "Certificates", icon: Award },
 ];
 
 export default function DashboardPage() {
@@ -80,6 +82,7 @@ export default function DashboardPage() {
             {activeTab === "skills" && <SkillsManager />}
             {activeTab === "journey" && <JourneyManager />}
             {activeTab === "projects" && <ProjectsManager />}
+            {activeTab === "certificates" && <CertificatesManager />}
           </motion.div>
         </AnimatePresence>
       </div>

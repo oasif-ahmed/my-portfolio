@@ -1,5 +1,6 @@
 import { getSkills, addSkill } from "@/actions/skills";
 import { getJourney, addJourneyItem } from "@/actions/journey";
+import { getCertificates } from "@/actions/certificates";
 import Home from "./home-page";
 
 const defaultSkills = [
@@ -50,10 +51,13 @@ export default async function Page() {
         journey = defaultJourney.map((item, i) => ({ ...item, id: "", order: i, highlights: item.highlights || [] }));
     }
 
+    const certificates = await getCertificates();
+
     return (
         <Home
             initialSkills={skills.map(s => ({ name: s.name, icon: s.icon, level: s.level }))}
             initialJourney={journey.map(j => ({ title: j.title, period: j.period, description: j.description, highlights: j.highlights, icons: j.icons }))}
+            initialCertificates={certificates?.map(c => ({ title: c.title, issuer: c.issuer, date: c.date, image: c.image, credentialUrl: c.credentialUrl })) || []}
         />
     );
 }

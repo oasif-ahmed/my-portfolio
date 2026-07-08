@@ -4,7 +4,11 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useLenis } from "lenis/react";
+import { createPortal } from "react-dom";
 import { ThemeToggle } from "./theme-toggle";
+import { BulgeText } from "./bulge-text";
+import { DashboardAuthModal } from "./dashboard-auth-gate";
 
 const navItems = [
     { name: "Home", href: "#" },
@@ -18,8 +22,25 @@ const navItems = [
 export function Navbar() {
     const [hoveredItem, setHoveredItem] = useState<string | null>(null);
     const [activeItem, setActiveItem] = useState("Home");
+    const [showAuth, setShowAuth] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const pathname = usePathname();
     const router = useRouter();
+    const lenis = useLenis();
+
+    useEffect(() => { setMounted(true); }, []);
+
+    const scrollTo = (href: string) => {
+        if (href === "#") {
+            lenis?.scrollTo(0, { duration: 1.2, easing: (t) => 1 - Math.pow(1 - t, 3) });
+        } else {
+            const target = href.replace("#", "");
+            const el = document.getElementById(target);
+            if (el && lenis) {
+                lenis.scrollTo(el, { duration: 1.2, easing: (t) => 1 - Math.pow(1 - t, 3) });
+            }
+        }
+    };
 
     useEffect(() => {
         if (pathname === "/journey") {
@@ -55,14 +76,15 @@ export function Navbar() {
     }, [pathname]);
 
     return (
-        <motion.header
+        <>
+            <motion.header
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-3xl"
+            className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-4xl"
         >
             <nav className="glass rounded-full px-4 py-2 flex items-center justify-between gap-2 overflow-hidden">
                 <div
-                    className="flex-1 flex items-center justify-start sm:justify-between px-1 relative overflow-x-auto no-scrollbar"
+                    className="flex-1 flex items-center justify-start sm:justify-between px-1 relative"
                     onMouseLeave={() => setHoveredItem(null)}
                 >
                     {navItems.map((item) => {
@@ -72,19 +94,23 @@ export function Navbar() {
                                 key={item.name}
                                 href={item.href}
                                 onMouseEnter={() => setHoveredItem(item.name)}
-                                onClick={() => setActiveItem(item.name)}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setActiveItem(item.name);
+                                    scrollTo(item.href);
+                                }}
                                 className={`text-[10px] sm:text-[11px] font-bold transition-all duration-300 relative px-2.5 sm:px-4 py-2 z-10 tracking-widest uppercase flex-shrink-0 ${isCurrent ? "text-foreground" : "text-muted/80"
                                     }`}
                             >
-                                {item.name}
+                                <BulgeText text={item.name} />
                                 {isCurrent && (
                                     <motion.div
-                                        layoutId="nav-blob"
-                                        className="absolute inset-0 bg-foreground/10 backdrop-blur-md rounded-full -z-10 border border-white/10"
+                                        layoutId="nav-active"
+                                        className="absolute inset-0 rounded-full bg-foreground/10 -z-10"
                                         transition={{
                                             type: "spring",
-                                            bounce: 0.2,
-                                            duration: 0.6
+                                            stiffness: 400,
+                                            damping: 30,
                                         }}
                                     />
                                 )}
@@ -95,7 +121,7 @@ export function Navbar() {
 
                 <div className="flex items-center gap-3 sm:gap-4 pl-3 sm:pl-6 border-l border-border flex-shrink-0">
                     <button 
-                        onClick={() => router.push('/dashboard')}
+                        onClick={() => setShowAuth(true)}
                         className="p-2 rounded-full hover:bg-foreground/5 transition-colors group relative"
                         title="Dashboard"
                     >
@@ -114,5 +140,15 @@ export function Navbar() {
                 </div>
             </nav>
         </motion.header>
+
+            {mounted && createPortal(
+                <DashboardAuthModal
+                    isOpen={showAuth}
+                    onClose={() => setShowAuth(false)}
+                    onSuccess={() => router.push('/dashboard')}
+                />,
+                document.body
+            )}
+        </>
     );
 }

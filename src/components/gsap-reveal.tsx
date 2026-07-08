@@ -19,8 +19,8 @@ export function GsapReveal({
     children,
     className = "",
     delay = 0,
-    y = 60,
-    duration = 1,
+    y = 80,
+    duration = 1.3,
 }: GsapRevealProps) {
     const ref = useRef<HTMLDivElement>(null);
 
@@ -36,12 +36,12 @@ export function GsapReveal({
                 y: 0,
                 duration,
                 delay,
-                ease: "power3.out",
+                ease: "power4.out",
                 scrollTrigger: {
                     trigger: el,
-                    start: "top 85%",
+                    start: "top 88%",
                     end: "bottom 20%",
-                    toggleActions: "play none none reverse",
+                    toggleActions: "play none none none",
                 },
             }
         );
@@ -84,13 +84,13 @@ export function GsapStaggerReveal({
                 opacity: 1,
                 y: 0,
                 scale: 1,
-                duration: 0.8,
+                duration: 1,
                 stagger: staggerAmount,
-                ease: "power3.out",
+                ease: "power4.out",
                 scrollTrigger: {
                     trigger: el,
-                    start: "top 85%",
-                    toggleActions: "play none none reverse",
+                    start: "top 88%",
+                    toggleActions: "play none none none",
                 },
             }
         );

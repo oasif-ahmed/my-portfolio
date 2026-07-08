@@ -18,6 +18,7 @@ import {
     ChevronRight,
     Sparkles,
 } from "lucide-react";
+import { BulgeText } from "@/components/bulge-text";
 
 export interface CustomProject {
     id?: string;
@@ -371,7 +372,7 @@ export function AddProjectModal({ isOpen, onClose, onSave, initialData }: AddPro
                                                         : "bg-foreground/5 border border-border text-muted hover:text-foreground"
                                                 }`}
                                             >
-                                                {s}
+                                                <BulgeText text={s} />
                                             </button>
                                         ))}
                                     </div>
@@ -420,7 +421,7 @@ export function AddProjectModal({ isOpen, onClose, onSave, initialData }: AddPro
                                         className="px-3 py-2 rounded-lg border border-dashed border-border text-xs text-muted/60 hover:text-foreground hover:border-foreground/20 transition-all"
                                     >
                                         <Upload size={14} className="inline mr-1" />
-                                        Upload
+                                        <BulgeText text="Upload" />
                                     </button>
                                     {images.length > 0 && (
                                         <span className="text-[10px] text-muted/40">{images.length} image{images.length > 1 ? 's' : ''}</span>
@@ -459,14 +460,14 @@ export function AddProjectModal({ isOpen, onClose, onSave, initialData }: AddPro
                                     onClick={handleClose}
                                     className="flex-1 py-2.5 rounded-xl border border-border text-xs font-semibold text-muted hover:text-foreground hover:bg-foreground/5 transition-all"
                                 >
-                                    Cancel
+                                    <BulgeText text="Cancel" />
                                 </button>
                                 <button
                                     onClick={handleSubmit}
                                     className="flex-1 py-2.5 rounded-xl bg-foreground text-background text-xs font-bold hover:scale-[1.02] active:scale-[0.98] transition-transform flex items-center justify-center gap-1.5 shadow-lg"
                                 >
                                     <Plus size={14} />
-                                    {initialData ? "Save Changes" : "Add Project"}
+                                    <BulgeText text={initialData ? "Save Changes" : "Add Project"} />
                                 </button>
                             </div>
                         </div>

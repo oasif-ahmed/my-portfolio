@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, Github, ChevronLeft, ChevronRight, X, Maximize2 } from "lucide-react";
+import { BulgeText } from "@/components/bulge-text";
 
 interface ProjectCardProps {
     title: string;
@@ -365,7 +366,7 @@ export function ProjectCard({ title, description, tags, status, images, liveLink
                                                         onClick={onEdit}
                                                         className="flex-1 py-3 rounded-xl border border-border bg-foreground/5 hover:bg-foreground/10 text-foreground text-sm font-semibold transition-all flex items-center justify-center gap-2"
                                                     >
-                                                        Edit Project
+                                                        <BulgeText text="Edit Project" />
                                                     </button>
                                                 )}
                                                 {onDelete && (
@@ -373,7 +374,7 @@ export function ProjectCard({ title, description, tags, status, images, liveLink
                                                         onClick={onDelete}
                                                         className="flex-1 py-3 rounded-xl border border-red-500/20 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm font-semibold transition-all flex items-center justify-center gap-2"
                                                     >
-                                                        Delete Project
+                                                        <BulgeText text="Delete Project" />
                                                     </button>
                                                 )}
                                             </div>

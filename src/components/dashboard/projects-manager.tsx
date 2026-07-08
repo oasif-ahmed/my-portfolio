@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Plus, Edit3, Trash2, ExternalLink, Github } from "lucide-react";
 import { AddProjectModal } from "@/components/add-project-modal";
 import { getProjects, addProject, updateProject, deleteProject, CustomProject } from "@/actions/projects";
+import { BulgeText } from "@/components/bulge-text";
 
 export function ProjectsManager() {
   const [projects, setProjects] = useState<CustomProject[]>([]);
@@ -59,7 +60,7 @@ export function ProjectsManager() {
           onClick={openAdd}
           className="px-4 py-2 rounded-xl bg-foreground text-background text-sm font-bold flex items-center gap-2 hover:scale-[1.02] transition-transform"
         >
-          <Plus size={16} /> Add Project
+          <Plus size={16} /> <BulgeText text="Add Project" />
         </button>
       </div>
 

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Plus, X, Save, Trash2, Edit3, Sparkles, Search } from "lucide-react";
 import { getSkills, addSkill, updateSkill, deleteSkill, Skill } from "@/actions/skills";
 import { getIcon, ALL_ICON_NAMES } from "@/lib/icons";
+import { BulgeText } from "@/components/bulge-text";
 
 export function SkillsManager() {
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -71,7 +72,7 @@ export function SkillsManager() {
           onClick={() => { resetForm(); setShowForm(true); }}
           className="px-4 py-2 rounded-xl bg-foreground text-background text-sm font-bold flex items-center gap-2 hover:scale-[1.02] transition-transform"
         >
-          <Plus size={16} /> Add Skill
+          <Plus size={16} /> <BulgeText text="Add Skill" />
         </button>
       </div>
 
@@ -155,10 +156,10 @@ export function SkillsManager() {
 
               <div className="flex gap-3 pt-2">
                 <button onClick={resetForm} className="flex-1 py-2.5 rounded-xl border border-border text-sm font-semibold text-muted hover:text-foreground transition-colors">
-                  Cancel
+                  <BulgeText text="Cancel" />
                 </button>
                 <button onClick={handleSave} className="flex-1 py-2.5 rounded-xl bg-foreground text-background text-sm font-bold flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform">
-                  <Save size={14} /> {editingId ? "Update" : "Save"}
+                  <Save size={14} /> <BulgeText text={editingId ? "Update" : "Save"} />
                 </button>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { GsapReveal } from "./gsap-reveal";
 import gsap from "gsap";
@@ -13,6 +13,47 @@ interface JourneyItem {
     icons: React.ElementType[];
 }
 
+function IconBulge({ Icon }: { Icon: React.ElementType }) {
+    const ref = useRef<HTMLDivElement>(null);
+
+    const handleEnter = useCallback(() => {
+        if (!ref.current) return;
+        gsap.to(ref.current, {
+            scale: 1.25,
+            x: 2,
+            y: -3,
+            rotateZ: 4,
+            duration: 0.35,
+            ease: "power3.out",
+            overwrite: "auto",
+        });
+    }, []);
+
+    const handleLeave = useCallback(() => {
+        if (!ref.current) return;
+        gsap.to(ref.current, {
+            scale: 1,
+            x: 0,
+            y: 0,
+            rotateZ: 0,
+            duration: 0.5,
+            ease: "elastic.out(1, 0.4)",
+            overwrite: "auto",
+        });
+    }, []);
+
+    return (
+        <div
+            ref={ref}
+            onMouseEnter={handleEnter}
+            onMouseLeave={handleLeave}
+            className="w-10 h-10 rounded-lg glass-card flex items-center justify-center text-muted/60 hover:text-foreground transition-colors duration-300 cursor-pointer will-change-transform"
+        >
+            <Icon size={20} />
+        </div>
+    );
+}
+
 interface JourneyProps {
     initialData?: JourneyItem[];
 }
@@ -20,7 +61,7 @@ interface JourneyProps {
 export function Journey({ initialData }: JourneyProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const lineRef = useRef<HTMLDivElement>(null);
-    const [journeyData, setJourneyData] = useState<JourneyItem[]>(initialData ?? []);
+    const journeyData = initialData ?? [];
 
     useEffect(() => {
         if (!lineRef.current || !containerRef.current) return;
@@ -44,20 +85,20 @@ export function Journey({ initialData }: JourneyProps) {
         gsap.utils.toArray<HTMLElement>('.journey-item').forEach((item, index) => {
             gsap.fromTo(item,
                 {
-                    y: 50,
+                    y: 80,
                     opacity: 0,
-                    scale: 0.9,
+                    scale: 0.85,
                 },
                 {
                     y: 0,
                     opacity: 1,
                     scale: 1,
-                    duration: 0.8,
-                    ease: "power3.out",
+                    duration: 1.2,
+                    ease: "power4.out",
                     scrollTrigger: {
                         trigger: item,
-                        start: "top 85%", // Trigger when top of item hits 85% of viewport height
-                        toggleActions: "play reverse play reverse", // Play animation when scrolling down, reverse when scrolling up
+                        start: "top 88%",
+                        toggleActions: "play none none none",
                     }
                 }
             );
@@ -128,12 +169,7 @@ export function Journey({ initialData }: JourneyProps) {
 
                                                 <div className={`flex flex-wrap gap-4 pt-2 ${isEven ? 'md:justify-start' : 'md:justify-end'}`}>
                                                     {item.icons.map((Icon, iconIndex) => (
-                                                        <div
-                                                            key={iconIndex}
-                                                            className="w-10 h-10 rounded-lg glass-card flex items-center justify-center text-muted/60 hover:text-foreground hover:scale-110 transition-all duration-300"
-                                                        >
-                                                            <Icon size={20} />
-                                                        </div>
+                                                        <IconBulge key={iconIndex} Icon={Icon} />
                                                     ))}
                                                 </div>
                                             </div>

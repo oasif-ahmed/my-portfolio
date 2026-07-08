@@ -5,6 +5,8 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { TypeAnimation } from "react-type-animation";
 import { ArrowUpRight, Github } from "lucide-react";
 import Image from "next/image";
+import { BulgeText } from "./bulge-text";
+import { MagnifierText } from "./magnifier-text";
 
 export function Hero() {
     const x = useMotionValue(0);
@@ -130,7 +132,7 @@ export function Hero() {
                 >
                     Hello, I&apos;m{" "}
                     <span className="text-foreground block mt-2">
-                        Oasif Ahmed Rikto.
+                        <MagnifierText text="OASIF AHMED RIKTO." className="cursor-none" zoom={2.5} lensRadius={70} />
                     </span>
                 </motion.h1>
 
@@ -180,7 +182,7 @@ export function Hero() {
                         transition={{ type: "spring", stiffness: 400, damping: 15 }}
                         className="px-8 py-4 rounded-full bg-foreground text-background font-bold text-base flex items-center gap-2 hover:shadow-[0_20px_40px_-15px_rgba(255,255,255,0.3)] transition-all shadow-xl"
                     >
-                        Connect now <ArrowUpRight size={20} />
+                        <BulgeText text="Connect now" /> <ArrowUpRight size={20} />
                     </motion.a>
                     <motion.a
                         href="https://github.com/oasif-ahmed"
@@ -191,7 +193,7 @@ export function Hero() {
                         transition={{ type: "spring", stiffness: 400, damping: 15 }}
                         className="px-8 py-4 rounded-full glass font-bold text-base flex items-center gap-2 hover:bg-foreground/5 transition-all"
                     >
-                        <Github size={20} /> GitHub
+                        <Github size={20} /> <BulgeText text="GitHub" />
                     </motion.a>
                 </motion.div>
             </div>
