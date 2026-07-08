@@ -85,7 +85,7 @@ export function SkillsGrid() {
     const positionRefs = useRef<(HTMLDivElement | null)[]>([]);
     const animateRefs = useRef<(HTMLDivElement | null)[]>([]);
     const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-    const [skills, setSkills] = useState<Skill[] | null>(null);
+    const [skills, setSkills] = useState<Skill[]>(defaultSkills);
 
     useEffect(() => {
         const load = async () => {
@@ -102,7 +102,6 @@ export function SkillsGrid() {
                     const iconName = iconEntry ? iconEntry[0] : "SiReact";
                     await addSkill({ name: s.name, icon: iconName, level: s.level });
                 }
-                setSkills(defaultSkills);
             }
         };
         load();
@@ -206,9 +205,6 @@ export function SkillsGrid() {
             </GsapReveal>
 
             <GsapReveal delay={0.15}>
-                {!skills ? (
-                    <div className="flex items-center justify-center py-24 text-muted/40 text-sm">Loading skills...</div>
-                ) : (
                 <div
                     onMouseMove={handleMouseMove}
                     onMouseLeave={handleMouseLeave}
@@ -300,7 +296,6 @@ export function SkillsGrid() {
                         );
                     })}
                 </div>
-                )}
             </GsapReveal>
         </section>
     );
