@@ -4,13 +4,9 @@ import React, { useRef, useCallback, useState, useEffect, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
 import { GsapReveal } from "./gsap-reveal";
-import {
-    SiReact, SiNextdotjs, SiTypescript, SiJavascript, SiNodedotjs,
-    SiExpress, SiMongodb, SiPostgresql, SiTailwindcss,
-    SiDocker, SiFigma, SiPython, SiFirebase, SiJsonwebtokens,
-    SiGit, SiHtml5, SiCss3, SiCplusplus, SiFramer, SiVite
-} from "react-icons/si";
 import { IconType } from "react-icons";
+import { getSkills, addSkill } from "@/actions/skills";
+import { getIcon, allIcons } from "@/lib/icons";
 
 interface Skill {
     name: string;
@@ -18,48 +14,40 @@ interface Skill {
     level: number;
 }
 
-const skills: Skill[] = [
-    // Row 0 — 4 icons
-    { name: "HTML5", icon: SiHtml5, level: 95 },
-    { name: "CSS3", icon: SiCss3, level: 90 },
-    { name: "JavaScript", icon: SiJavascript, level: 85 },
-    { name: "TypeScript", icon: SiTypescript, level: 80 },
-    // Row 1 — 5 icons
-    { name: "React", icon: SiReact, level: 90 },
-    { name: "Next.js", icon: SiNextdotjs, level: 85 },
-    { name: "Tailwind CSS", icon: SiTailwindcss, level: 95 },
-    { name: "Framer Motion", icon: SiFramer, level: 75 },
-    { name: "Vite", icon: SiVite, level: 80 },
-    // Row 2 — 6 icons (widest)
-    { name: "Node.js", icon: SiNodedotjs, level: 75 },
-    { name: "Express", icon: SiExpress, level: 80 },
-    { name: "MongoDB", icon: SiMongodb, level: 70 },
-    { name: "PostgreSQL", icon: SiPostgresql, level: 65 },
-    { name: "Firebase", icon: SiFirebase, level: 75 },
-    { name: "JWT", icon: SiJsonwebtokens, level: 90 },
-    // Row 3 — 5 icons
-    { name: "Python", icon: SiPython, level: 80 },
-    { name: "C++", icon: SiCplusplus, level: 70 },
-    { name: "Docker", icon: SiDocker, level: 60 },
-    { name: "Git", icon: SiGit, level: 85 },
-    { name: "Figma", icon: SiFigma, level: 70 },
-];
-
 // ─── Apple Watch Diamond Honeycomb ─────────────────────────────────
 // Widest in the middle, tapers at top and bottom → fills horizontal space
-const HONEYCOMB_ROWS = [4, 5, 6, 5];
-
 // ─── Fisheye Config ────────────────────────────────────────────────
 const INFLUENCE_RADIUS = 200;
 const MAX_SCALE = 1.65;
 const SHRINK_SCALE = 0.88;
 const PUSH_STRENGTH = 15;
 
-function computeHoneycombPositions() {
-    const positions: { unitX: number; unitY: number }[] = [];
-    const totalRows = HONEYCOMB_ROWS.length;
+function computeHoneycombRows(count: number): number[] {
+    if (count <= 0) return [];
+    if (count <= 4) return [count];
+    const rows: number[] = [];
+    let remaining = count;
+    let current = 4;
+    let increasing = true;
+    while (remaining > 0) {
+        const take = Math.min(current, remaining);
+        rows.push(take);
+        remaining -= take;
+        if (increasing) {
+            if (current >= 6) increasing = false;
+            else current++;
+        } else {
+            current--;
+            if (current < 3) current = 3;
+        }
+    }
+    return rows;
+}
 
-    HONEYCOMB_ROWS.forEach((count, rowIdx) => {
+function computeHoneycombPositions(rows: number[]) {
+    const positions: { unitX: number; unitY: number }[] = [];
+    const totalRows = rows.length;
+    rows.forEach((count, rowIdx) => {
         for (let col = 0; col < count; col++) {
             positions.push({
                 unitX: col - (count - 1) / 2,
@@ -67,18 +55,63 @@ function computeHoneycombPositions() {
             });
         }
     });
-
     return positions;
 }
 
-const GRID_POSITIONS = computeHoneycombPositions();
+const defaultSkills: Skill[] = [
+    { name: "HTML5", icon: getIcon("SiHtml5")!, level: 95 },
+    { name: "CSS3", icon: getIcon("SiCss3")!, level: 90 },
+    { name: "JavaScript", icon: getIcon("SiJavascript")!, level: 85 },
+    { name: "TypeScript", icon: getIcon("SiTypescript")!, level: 80 },
+    { name: "React", icon: getIcon("SiReact")!, level: 90 },
+    { name: "Next.js", icon: getIcon("SiNextdotjs")!, level: 85 },
+    { name: "Tailwind CSS", icon: getIcon("SiTailwindcss")!, level: 95 },
+    { name: "Framer Motion", icon: getIcon("SiFramer")!, level: 75 },
+    { name: "Vite", icon: getIcon("SiVite")!, level: 80 },
+    { name: "Node.js", icon: getIcon("SiNodedotjs")!, level: 75 },
+    { name: "Express", icon: getIcon("SiExpress")!, level: 80 },
+    { name: "MongoDB", icon: getIcon("SiMongodb")!, level: 70 },
+    { name: "PostgreSQL", icon: getIcon("SiPostgresql")!, level: 65 },
+    { name: "Firebase", icon: getIcon("SiFirebase")!, level: 75 },
+    { name: "JWT", icon: getIcon("SiJsonwebtokens")!, level: 90 },
+    { name: "Python", icon: getIcon("SiPython")!, level: 80 },
+    { name: "C++", icon: getIcon("SiCplusplus")!, level: 70 },
+    { name: "Docker", icon: getIcon("SiDocker")!, level: 60 },
+    { name: "Git", icon: getIcon("SiGit")!, level: 85 },
+    { name: "Figma", icon: getIcon("SiFigma")!, level: 70 },
+];
 
 export function SkillsGrid() {
     const positionRefs = useRef<(HTMLDivElement | null)[]>([]);
     const animateRefs = useRef<(HTMLDivElement | null)[]>([]);
     const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+    const [skills, setSkills] = useState<Skill[]>(defaultSkills);
+
+    useEffect(() => {
+        const load = async () => {
+            const data = await getSkills();
+            if (data && data.length > 0) {
+                setSkills(data.map((s) => ({
+                    name: s.name,
+                    icon: getIcon(s.icon) || defaultSkills.find(d => d.name === s.name)?.icon || getIcon("SiReact")!,
+                    level: s.level,
+                })));
+            } else {
+                for (const s of defaultSkills) {
+                    const iconEntry = Object.entries(allIcons).find(([, v]) => v === s.icon);
+                    const iconName = iconEntry ? iconEntry[0] : "SiReact";
+                    await addSkill({ name: s.name, icon: iconName, level: s.level });
+                }
+                setSkills(defaultSkills);
+            }
+        };
+        load();
+    }, []);
 
     const [dims, setDims] = useState({ cellW: 108, cellH: 95, iconSize: 84 });
+
+    const honeycombRows = useMemo(() => computeHoneycombRows(skills.length), [skills]);
+    const gridPositions = useMemo(() => computeHoneycombPositions(honeycombRows), [honeycombRows]);
 
     useEffect(() => {
         const update = () => {
@@ -96,9 +129,10 @@ export function SkillsGrid() {
     }, []);
 
     const containerHeight = useMemo(() => {
-        const maxRowIdx = (HONEYCOMB_ROWS.length - 1) / 2;
+        const totalRows = honeycombRows.length;
+        const maxRowIdx = (totalRows - 1) / 2;
         return Math.ceil(maxRowIdx * 2 * dims.cellH + dims.iconSize + 80);
-    }, [dims]);
+    }, [dims, honeycombRows]);
 
     // ─── Fisheye engine ────────────────────────────────────────────
     const handleMouseMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
@@ -209,7 +243,7 @@ export function SkillsGrid() {
                     ))}
 
                     {/* ── Honeycomb icons ── */}
-                    {GRID_POSITIONS.map((pos, i) => {
+                    {gridPositions.map((pos, i) => {
                         const skill = skills[i];
                         if (!skill) return null;
 

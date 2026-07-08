@@ -20,14 +20,14 @@ import {
 } from "lucide-react";
 
 export interface CustomProject {
-    id: string;
+    id?: string;
     title: string;
     description: string;
     tags: string[];
     status: string;
     images: string[]; // base64 strings
-    liveLink: string;
-    repoLink: string;
+    liveLink?: string;
+    repoLink?: string;
     challenges?: string;
     futurePlans?: string;
 }
@@ -102,6 +102,15 @@ export function AddProjectModal({ isOpen, onClose, onSave, initialData }: AddPro
     const [isDragging, setIsDragging] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+        return () => { document.body.style.overflow = ""; };
+    }, [isOpen]);
 
     const resetForm = () => {
         setTitle("");
@@ -240,159 +249,43 @@ export function AddProjectModal({ isOpen, onClose, onSave, initialData }: AddPro
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8"
+                    className="fixed inset-0 z-50 overflow-y-auto"
                 >
                     {/* Backdrop */}
                     <motion.div
                         initial={{ backdropFilter: "blur(0px)" }}
                         animate={{ backdropFilter: "blur(12px)" }}
-                        className="absolute inset-0 bg-background/70"
+                        className="fixed inset-0 bg-background/70"
                         onClick={handleClose}
                     />
 
-                    {/* Modal Content */}
-                    <motion.div
-                        initial={{ scale: 0.9, opacity: 0, y: 30 }}
-                        animate={{ scale: 1, opacity: 1, y: 0 }}
-                        exit={{ scale: 0.9, opacity: 0, y: 30 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                        className="glass-card w-full max-w-3xl max-h-[85vh] overflow-y-auto rounded-3xl relative z-10 border border-border/50 shadow-2xl scrollbar-hide"
-                        onClick={(e) => e.stopPropagation()}
-                    >
+                    <div className="flex items-center justify-center min-h-full p-4">
+                        {/* Modal Content */}
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0, y: 30 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 30 }}
+                            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                            className="glass-card w-full max-w-xl rounded-2xl relative z-10 border border-border/50 shadow-2xl"
+                            onClick={(e) => e.stopPropagation()}
+                        >
                         {/* Modal Header */}
-                        <div className="sticky top-0 z-30 px-6 py-4 border-b border-border bg-background/80 backdrop-blur-xl flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 rounded-xl bg-green-500/10 border border-green-500/20">
-                                    <Sparkles size={18} className="text-green-400" />
-                                </div>
-                                <h2 className="text-lg font-bold tracking-tight">{initialData ? "Edit Project" : "Add New Project"}</h2>
-                            </div>
+                        <div className="px-4 py-3 border-b border-border bg-background/80 backdrop-blur-xl flex items-center justify-between rounded-t-2xl">
+                            <h2 className="text-sm font-bold tracking-tight">{initialData ? "Edit Project" : "Add New Project"}</h2>
                             <button
                                 onClick={handleClose}
-                                className="p-2 rounded-xl hover:bg-foreground/5 text-muted hover:text-foreground transition-colors"
+                                className="p-1.5 rounded-lg hover:bg-foreground/5 text-muted hover:text-foreground transition-colors"
                             >
-                                <X size={20} />
+                                <X size={16} />
                             </button>
                         </div>
 
-                        <div className="p-6 md:p-8 flex flex-col gap-6">
-                            {/* Image Upload Area */}
-                            <div>
-                                <label className="text-sm font-bold uppercase tracking-widest text-foreground/40 mb-3 flex items-center gap-2">
-                                    <ImagePlus size={14} />
-                                    Project Screenshots
-                                </label>
-
-                                {/* Image Preview */}
-                                {images.length > 0 && (
-                                    <div className="mb-4">
-                                        <div className="w-full aspect-video rounded-2xl bg-surface border border-border relative overflow-hidden group/preview">
-                                            <img
-                                                src={images[currentPreview]}
-                                                alt="Preview"
-                                                className="w-full h-full object-cover"
-                                            />
-                                            {images.length > 1 && (
-                                                <>
-                                                    <button
-                                                        onClick={() =>
-                                                            setCurrentPreview(
-                                                                (prev) => (prev - 1 + images.length) % images.length
-                                                            )
-                                                        }
-                                                        className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-background/70 backdrop-blur-sm opacity-0 group-hover/preview:opacity-100 transition-opacity border border-border"
-                                                    >
-                                                        <ChevronLeft size={16} />
-                                                    </button>
-                                                    <button
-                                                        onClick={() =>
-                                                            setCurrentPreview(
-                                                                (prev) => (prev + 1) % images.length
-                                                            )
-                                                        }
-                                                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-background/70 backdrop-blur-sm opacity-0 group-hover/preview:opacity-100 transition-opacity border border-border"
-                                                    >
-                                                        <ChevronRight size={16} />
-                                                    </button>
-                                                </>
-                                            )}
-                                        </div>
-
-                                        {/* Thumbnail Strip */}
-                                        <div className="flex gap-2 mt-3 overflow-x-auto scrollbar-hide pb-1">
-                                            {images.map((img, i) => (
-                                                <div key={i} className="relative group/thumb flex-shrink-0">
-                                                    <button
-                                                        onClick={() => setCurrentPreview(i)}
-                                                        className={`w-16 h-12 rounded-lg overflow-hidden border-2 transition-all ${
-                                                            i === currentPreview
-                                                                ? "border-foreground/40 scale-105"
-                                                                : "border-border opacity-60 hover:opacity-100"
-                                                        }`}
-                                                    >
-                                                        <img
-                                                            src={img}
-                                                            alt=""
-                                                            className="w-full h-full object-cover"
-                                                        />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => removeImage(i)}
-                                                        className="absolute -top-1.5 -right-1.5 p-0.5 rounded-full bg-red-500 text-white opacity-0 group-hover/thumb:opacity-100 transition-opacity"
-                                                    >
-                                                        <X size={10} />
-                                                    </button>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Drop Zone */}
-                                <div
-                                    onDragOver={(e) => {
-                                        e.preventDefault();
-                                        setIsDragging(true);
-                                    }}
-                                    onDragLeave={() => setIsDragging(false)}
-                                    onDrop={handleDrop}
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className={`w-full py-8 rounded-2xl border-2 border-dashed transition-all cursor-pointer flex flex-col items-center justify-center gap-3 ${
-                                        isDragging
-                                            ? "border-green-400/50 bg-green-400/5"
-                                            : "border-border hover:border-foreground/20 hover:bg-foreground/[0.02]"
-                                    }`}
-                                >
-                                    <Upload
-                                        size={24}
-                                        className={`transition-colors ${
-                                            isDragging ? "text-green-400" : "text-muted/40"
-                                        }`}
-                                    />
-                                    <div className="text-center">
-                                        <p className="text-sm font-medium text-muted/60">
-                                            {isDragging
-                                                ? "Drop images here"
-                                                : "Drag & drop images or click to browse"}
-                                        </p>
-                                        <p className="text-xs text-muted/30 mt-1">PNG, JPG, WebP supported</p>
-                                    </div>
-                                </div>
-                                <input
-                                    ref={fileInputRef}
-                                    type="file"
-                                    accept="image/*"
-                                    multiple
-                                    onChange={handleFileSelect}
-                                    className="hidden"
-                                />
-                            </div>
-
+                        <div className="p-4 flex flex-col gap-3">
                             {/* Title */}
                             <div>
-                                <label className="text-sm font-bold uppercase tracking-widest text-foreground/40 mb-3 flex items-center gap-2">
-                                    <Type size={14} />
-                                    Project Title <span className="text-red-400">*</span>
+                                <label className="text-[11px] font-bold uppercase tracking-widest text-foreground/40 mb-1.5 flex items-center gap-1.5">
+                                    <Type size={12} />
+                                    Title <span className="text-red-400">*</span>
                                 </label>
                                 <input
                                     type="text"
@@ -402,19 +295,19 @@ export function AddProjectModal({ isOpen, onClose, onSave, initialData }: AddPro
                                         if (errors.title) setErrors((prev) => ({ ...prev, title: "" }));
                                     }}
                                     placeholder="e.g. My Awesome Project"
-                                    className={`w-full px-4 py-3 rounded-xl bg-foreground/[0.03] border ${
+                                    className={`w-full px-3 py-2 rounded-lg bg-foreground/[0.03] border text-sm ${
                                         errors.title ? "border-red-400/50" : "border-border"
-                                    } text-foreground placeholder:text-muted/30 focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/20 transition-all text-sm`}
+                                    } text-foreground placeholder:text-muted/30 focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/20 transition-all`}
                                 />
                                 {errors.title && (
-                                    <p className="text-xs text-red-400 mt-1.5">{errors.title}</p>
+                                    <p className="text-xs text-red-400 mt-1">{errors.title}</p>
                                 )}
                             </div>
 
                             {/* Description */}
                             <div>
-                                <label className="text-sm font-bold uppercase tracking-widest text-foreground/40 mb-3 flex items-center gap-2">
-                                    <FileText size={14} />
+                                <label className="text-[11px] font-bold uppercase tracking-widest text-foreground/40 mb-1.5 flex items-center gap-1.5">
+                                    <FileText size={12} />
                                     Description <span className="text-red-400">*</span>
                                 </label>
                                 <textarea
@@ -424,122 +317,161 @@ export function AddProjectModal({ isOpen, onClose, onSave, initialData }: AddPro
                                         if (errors.description)
                                             setErrors((prev) => ({ ...prev, description: "" }));
                                     }}
-                                    placeholder="Describe your project, its features, and what makes it special..."
-                                    rows={4}
-                                    className={`w-full px-4 py-3 rounded-xl bg-foreground/[0.03] border ${
+                                    placeholder="Describe your project..."
+                                    rows={2}
+                                    className={`w-full px-3 py-2 rounded-lg bg-foreground/[0.03] border text-sm resize-none ${
                                         errors.description ? "border-red-400/50" : "border-border"
-                                    } text-foreground placeholder:text-muted/30 focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/20 transition-all text-sm resize-none`}
+                                    } text-foreground placeholder:text-muted/30 focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/20 transition-all`}
                                 />
                                 {errors.description && (
-                                    <p className="text-xs text-red-400 mt-1.5">{errors.description}</p>
+                                    <p className="text-xs text-red-400 mt-1">{errors.description}</p>
                                 )}
                             </div>
 
-                            {/* Tags */}
-                            <div>
-                                <label className="text-sm font-bold uppercase tracking-widest text-foreground/40 mb-3 flex items-center gap-2">
-                                    <Tag size={14} />
-                                    Tech Stack
-                                </label>
-                                <div className="flex flex-wrap gap-2 mb-2">
-                                    {tags.map((tag) => (
-                                        <motion.span
-                                            key={tag}
-                                            initial={{ scale: 0, opacity: 0 }}
-                                            animate={{ scale: 1, opacity: 1 }}
-                                            exit={{ scale: 0, opacity: 0 }}
-                                            className="px-3 py-1.5 rounded-lg bg-foreground/5 border border-border text-xs font-semibold text-muted flex items-center gap-1.5 group/tag"
-                                        >
-                                            {tag}
-                                            <button
-                                                onClick={() => removeTag(tag)}
-                                                className="text-muted/40 hover:text-red-400 transition-colors"
-                                            >
-                                                <X size={12} />
-                                            </button>
-                                        </motion.span>
-                                    ))}
+                            {/* Tags + Status row */}
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="text-[11px] font-bold uppercase tracking-widest text-foreground/40 mb-1.5 flex items-center gap-1.5">
+                                        <Tag size={12} />
+                                        Tags
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={tagInput}
+                                        onChange={(e) => setTagInput(e.target.value)}
+                                        onKeyDown={handleAddTag}
+                                        placeholder="Press Enter to add"
+                                        className="w-full px-3 py-2 rounded-lg bg-foreground/[0.03] border border-border text-foreground placeholder:text-muted/30 focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/20 transition-all text-sm"
+                                    />
+                                    {tags.length > 0 && (
+                                        <div className="flex flex-wrap gap-1 mt-1.5">
+                                            {tags.map((tag) => (
+                                                <span key={tag} className="px-2 py-0.5 rounded-md bg-foreground/5 border border-border text-[10px] font-semibold text-muted flex items-center gap-1">
+                                                    {tag}
+                                                    <button onClick={() => removeTag(tag)} className="text-muted/40 hover:text-red-400">
+                                                        <X size={10} />
+                                                    </button>
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
-                                <input
-                                    type="text"
-                                    value={tagInput}
-                                    onChange={(e) => setTagInput(e.target.value)}
-                                    onKeyDown={handleAddTag}
-                                    placeholder="Type a tag and press Enter..."
-                                    className="w-full px-4 py-3 rounded-xl bg-foreground/[0.03] border border-border text-foreground placeholder:text-muted/30 focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/20 transition-all text-sm"
-                                />
-                            </div>
-
-                            {/* Status */}
-                            <div>
-                                <label className="text-sm font-bold uppercase tracking-widest text-foreground/40 mb-3 block">
-                                    Status
-                                </label>
-                                <div className="flex gap-2">
-                                    {["Latest", "Active", "Archived", "WIP"].map((s) => (
-                                        <button
-                                            key={s}
-                                            onClick={() => setStatus(s)}
-                                            className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${
-                                                status === s
-                                                    ? "bg-foreground text-background"
-                                                    : "bg-foreground/5 border border-border text-muted hover:text-foreground"
-                                            }`}
-                                        >
-                                            {s}
-                                        </button>
-                                    ))}
+                                <div>
+                                    <label className="text-[11px] font-bold uppercase tracking-widest text-foreground/40 mb-1.5 block">
+                                        Status
+                                    </label>
+                                    <div className="flex gap-1">
+                                        {["Latest", "Active", "Archived", "WIP"].map((s) => (
+                                            <button
+                                                key={s}
+                                                onClick={() => setStatus(s)}
+                                                className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${
+                                                    status === s
+                                                        ? "bg-foreground text-background"
+                                                        : "bg-foreground/5 border border-border text-muted hover:text-foreground"
+                                                }`}
+                                            >
+                                                {s}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
 
                             {/* Links */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="text-sm font-bold uppercase tracking-widest text-foreground/40 mb-3 flex items-center gap-2">
-                                        <Link size={14} />
+                                    <label className="text-[11px] font-bold uppercase tracking-widest text-foreground/40 mb-1.5 flex items-center gap-1.5">
+                                        <Link size={12} />
                                         Live Link
                                     </label>
                                     <input
                                         type="url"
                                         value={liveLink}
                                         onChange={(e) => setLiveLink(e.target.value)}
-                                        placeholder="https://your-project.com"
-                                        className="w-full px-4 py-3 rounded-xl bg-foreground/[0.03] border border-border text-foreground placeholder:text-muted/30 focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/20 transition-all text-sm"
+                                        placeholder="https://..."
+                                        className="w-full px-3 py-2 rounded-lg bg-foreground/[0.03] border border-border text-foreground placeholder:text-muted/30 focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/20 transition-all text-sm"
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-sm font-bold uppercase tracking-widest text-foreground/40 mb-3 flex items-center gap-2">
-                                        <Github size={14} />
-                                        GitHub Repo
+                                    <label className="text-[11px] font-bold uppercase tracking-widest text-foreground/40 mb-1.5 flex items-center gap-1.5">
+                                        <Github size={12} />
+                                        Repo
                                     </label>
                                     <input
                                         type="url"
                                         value={repoLink}
                                         onChange={(e) => setRepoLink(e.target.value)}
-                                        placeholder="https://github.com/you/repo"
-                                        className="w-full px-4 py-3 rounded-xl bg-foreground/[0.03] border border-border text-foreground placeholder:text-muted/30 focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/20 transition-all text-sm"
+                                        placeholder="https://github.com/..."
+                                        className="w-full px-3 py-2 rounded-lg bg-foreground/[0.03] border border-border text-foreground placeholder:text-muted/30 focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/20 transition-all text-sm"
                                     />
                                 </div>
                             </div>
 
+                            {/* Images */}
+                            <div>
+                                <label className="text-[11px] font-bold uppercase tracking-widest text-foreground/40 mb-1.5 flex items-center gap-1.5">
+                                    <ImagePlus size={12} />
+                                    Screenshots
+                                </label>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="px-3 py-2 rounded-lg border border-dashed border-border text-xs text-muted/60 hover:text-foreground hover:border-foreground/20 transition-all"
+                                    >
+                                        <Upload size={14} className="inline mr-1" />
+                                        Upload
+                                    </button>
+                                    {images.length > 0 && (
+                                        <span className="text-[10px] text-muted/40">{images.length} image{images.length > 1 ? 's' : ''}</span>
+                                    )}
+                                </div>
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    onChange={handleFileSelect}
+                                    className="hidden"
+                                />
+                                {images.length > 0 && (
+                                    <div className="flex gap-1.5 mt-2 overflow-x-auto scrollbar-hide">
+                                        {images.map((img, i) => (
+                                            <div key={i} className="relative group/thumb flex-shrink-0">
+                                                <div className="w-12 h-9 rounded-md overflow-hidden border border-border">
+                                                    <img src={img} alt="" className="w-full h-full object-cover" />
+                                                </div>
+                                                <button
+                                                    onClick={() => removeImage(i)}
+                                                    className="absolute -top-1 -right-1 p-0.5 rounded-full bg-red-500 text-white opacity-0 group-hover/thumb:opacity-100 transition-opacity"
+                                                >
+                                                    <X size={8} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
                             {/* Actions */}
-                            <div className="flex items-center gap-3 pt-4 border-t border-border">
+                            <div className="flex items-center gap-2 pt-3 border-t border-border">
                                 <button
                                     onClick={handleClose}
-                                    className="flex-1 py-3.5 rounded-2xl border border-border text-sm font-semibold text-muted hover:text-foreground hover:bg-foreground/5 transition-all"
+                                    className="flex-1 py-2.5 rounded-xl border border-border text-xs font-semibold text-muted hover:text-foreground hover:bg-foreground/5 transition-all"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleSubmit}
-                                    className="flex-1 py-3.5 rounded-2xl bg-foreground text-background text-sm font-bold hover:scale-[1.02] active:scale-[0.98] transition-transform flex items-center justify-center gap-2 shadow-xl"
+                                    className="flex-1 py-2.5 rounded-xl bg-foreground text-background text-xs font-bold hover:scale-[1.02] active:scale-[0.98] transition-transform flex items-center justify-center gap-1.5 shadow-lg"
                                 >
-                                    <Plus size={16} />
+                                    <Plus size={14} />
                                     {initialData ? "Save Changes" : "Add Project"}
                                 </button>
                             </div>
                         </div>
                     </motion.div>
+                    </div>
                 </motion.div>
             )}
         </AnimatePresence>

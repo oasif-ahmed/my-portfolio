@@ -1,15 +1,10 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { GsapReveal } from "./gsap-reveal";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import {
-    SiJavascript, SiReact, SiNextdotjs, SiTypescript, SiNodedotjs, SiExpress,
-    SiMongodb, SiPostgresql, SiTailwindcss, SiDocker, SiPython,
-    SiFirebase, SiDjango, SiCplusplus, SiC, SiPostman, SiGithub, SiTableau, SiChartdotjs, SiD3Dotjs,
-    SiHtml5, SiCss3, SiSwift
-} from "react-icons/si";
-import { Book, Award, Code2, Database, Terminal, Cpu, Tablet, Bot, Sparkles } from "lucide-react";
+import { getJourney, addJourneyItem } from "@/actions/journey";
+import { getIcon, allIcons } from "@/lib/icons";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -21,43 +16,86 @@ interface JourneyItem {
     icons: React.ElementType[];
 }
 
-const journeyData: JourneyItem[] = [
+interface DefaultJourneyRaw {
+    title: string;
+    period: string;
+    description: string;
+    highlights?: string[];
+    icons: string[];
+}
+
+const defaultJourneyRaw: DefaultJourneyRaw[] = [
     {
         title: "B.Sc. in Computer Science",
         period: "2022 - 2026",
         description: "Prime University. Graduated with a focus on Software Engineering and Artificial Intelligence. Participated in multiple hackathons and led the university programming club.",
-        icons: [Book, Award, Terminal]
+        icons: ["Book", "Award", "Terminal"]
     },
     {
         title: "Exploration Phase",
         period: "2022 - 2023",
         description: "Started my coding journey by exploring the fundamentals. Mastered core languages and began building static and dynamic web interfaces while learning the basics of containerization and databases.",
-        icons: [SiC, SiCplusplus, SiHtml5, SiCss3, SiPython, SiJavascript, SiDocker, SiPostgresql]
+        icons: ["SiC", "SiCplusplus", "SiHtml5", "SiCss3", "SiPython", "SiJavascript", "SiDocker", "SiPostgresql"]
     },
     {
         title: "Core Concepts & Mobile Development",
         period: "2023 - 2024",
         description: "Grabbed core software engineering concepts including Object-Oriented Programming (OOP) and Data Structures & Algorithms. Expanded into mobile development with modern frameworks.",
         highlights: ["Deep dive into OOP and DSA", "Explored React Native and Swift for mobile apps"],
-        icons: [Code2, Database, SiReact, SiSwift, Tablet, Terminal]
+        icons: ["Code2", "Database", "SiReact", "SiSwift", "Tablet", "Terminal"]
     },
     {
         title: "Full Stack Development",
         period: "2024 - 2025",
         description: "Transitioned into full-scale professional development. Focused on building high-performance, secure, and scalable MERN stack applications with integrated cloud services.",
-        icons: [SiJavascript, SiTypescript, SiReact, SiNextdotjs, SiNodedotjs, SiExpress, SiMongodb, SiTailwindcss, SiPostman, SiDocker]
+        icons: ["SiJavascript", "SiTypescript", "SiReact", "SiNextdotjs", "SiNodedotjs", "SiExpress", "SiMongodb", "SiTailwindcss", "SiPostman", "SiDocker"]
     },
     {
         title: "AI-Enhanced Development",
         period: "2025 - 2026",
         description: "Mastering the integration of AI into the software engineering lifecycle. Developing a deep understanding of AI-assisted coding, advanced prompt engineering, and utilizing tools like ChatGPT, Claude Code, Antigravity, Cursor, and Windsurf to supercharge development workflows.",
-        icons: [Bot, Sparkles, Cpu, Terminal, Code2]
+        icons: ["Bot", "Sparkles", "Cpu", "Terminal", "Code2"]
     }
 ];
+
+const defaultJourneyData: JourneyItem[] = defaultJourneyRaw.map((item) => ({
+    ...item,
+    icons: item.icons.map((name) => getIcon(name)).filter(Boolean) as React.ElementType[],
+}));
 
 export function Journey() {
     const containerRef = useRef<HTMLDivElement>(null);
     const lineRef = useRef<HTMLDivElement>(null);
+    const [journeyData, setJourneyData] = useState<JourneyItem[]>(defaultJourneyData);
+
+    useEffect(() => {
+        const load = async () => {
+            const data = await getJourney();
+            if (data && data.length > 0) {
+                setJourneyData(data.map((item) => ({
+                    title: item.title,
+                    period: item.period,
+                    description: item.description,
+                    highlights: item.highlights,
+                    icons: item.icons.map((name: string) => getIcon(name)).filter(Boolean) as React.ElementType[],
+                })));
+            } else {
+                for (let i = 0; i < defaultJourneyRaw.length; i++) {
+                    const item = defaultJourneyRaw[i];
+                    await addJourneyItem({
+                        title: item.title,
+                        period: item.period,
+                        description: item.description,
+                        highlights: item.highlights,
+                        icons: item.icons,
+                        order: i,
+                    });
+                }
+                setJourneyData(defaultJourneyData);
+            }
+        };
+        load();
+    }, []);
 
     useEffect(() => {
         if (!lineRef.current || !containerRef.current) return;

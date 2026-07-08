@@ -1,23 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
-import { InteractiveTerminal } from "@/components/terminal";
 import { TechMarquee } from "@/components/tech-marquee";
 import { SkillsGrid } from "@/components/skills-grid";
 import { Journey } from "@/components/journey";
 import { GithubCalendar } from "@/components/github-calendar";
 import { ProjectHoverList } from "@/components/project-hover-list";
-import { AddProjectCard, AddProjectModal, CustomProject } from "@/components/add-project-modal";
-import { GsapReveal, GsapParallax } from "@/components/gsap-reveal";
+import { GsapReveal } from "@/components/gsap-reveal";
 
 import { Mail, Copy, Github, Linkedin, Twitter, Phone, MessageCircle } from "lucide-react";
-import { getProjects, addProject, updateProject, deleteProject } from "@/actions/projects";
-
-const STORAGE_KEY = "portfolio-custom-projects";
+import { getProjects, addProject } from "@/actions/projects";
 
 const defaultProjects = [
   {
@@ -34,8 +30,6 @@ const defaultProjects = [
     ],
     liveLink: "https://local-chef-bazaar-client.vercel.app/",
     repoLink: "https://github.com/oasif-ahmed/local-chef-bazaar-client?tab=readme-ov-file",
-    challenges: "[Please describe the challenges faced while developing Local Chef Bazaar]",
-    futurePlans: "[Please describe potential improvements and future plans for Local Chef Bazaar]",
   },
   {
     title: "My Tools",
@@ -51,8 +45,6 @@ const defaultProjects = [
     ],
     liveLink: "https://peoject-my-tools.vercel.app/",
     repoLink: "https://github.com/oasif-ahmed/peoject-myTools?tab=readme-ov-file",
-    challenges: "[Please describe the challenges faced while developing My Tools]",
-    futurePlans: "[Please describe potential improvements and future plans for My Tools]",
   },
   {
     title: "Hero.io",
@@ -67,92 +59,22 @@ const defaultProjects = [
     ],
     liveLink: "https://scintillating-parfait-b3d78e.netlify.app",
     repoLink: "https://github.com/oasif-ahmed/hero-io",
-    challenges: "[Please describe the challenges faced while developing Hero.io]",
-    futurePlans: "[Please describe potential improvements and future plans for Hero.io]",
   },
 
 ];
 
 export default function Home() {
-  const [customProjects, setCustomProjects] = useState<CustomProject[]>([]);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-  const [passwordInput, setPasswordInput] = useState("");
-  const [passwordError, setPasswordError] = useState(false);
-  const [isVerified, setIsVerified] = useState(false);
+  const router = useRouter();
+  const [customProjects, setCustomProjects] = useState<any[]>([]);
 
-  type PendingAction = { type: "ADD" } | { type: "EDIT", project: CustomProject } | { type: "DELETE", id: string };
-  const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
-  const [editProjectData, setEditProjectData] = useState<CustomProject | null>(null);
-
-  const OWNER_HASH = "731840f6fb7cdf7057bddeea86c9534e894d9b4fe8a3ed875d8c65ea74009046";
-
-  async function hashPassword(password: string): Promise<string> {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-  }
-
-  const handleAuthTrigger = (action: PendingAction) => {
-    if (isVerified) {
-      executeAction(action);
-    } else {
-      setPendingAction(action);
-      setIsPasswordModalOpen(true);
-      setPasswordInput("");
-      setPasswordError(false);
-    }
-  };
-
-  const executeAction = async (action: PendingAction) => {
-    if (action.type === "ADD") {
-      setEditProjectData(null);
-      setIsAddModalOpen(true);
-    } else if (action.type === "EDIT") {
-      setEditProjectData(action.project);
-      setIsAddModalOpen(true);
-    } else if (action.type === "DELETE") {
-      if (confirm("Are you sure you want to delete this project?")) {
-        const { success } = await deleteProject(action.id);
-        if (success) {
-          setCustomProjects(customProjects.filter((p) => p.id !== action.id));
-        } else {
-          alert("Failed to delete project from database");
-        }
-      }
-    }
-
-    // Always lock the system again immediately after action is granted!
-    setIsVerified(false);
-  };
-
-  const handlePasswordSubmit = async () => {
-    const hashed = await hashPassword(passwordInput);
-    if (hashed === OWNER_HASH) {
-      setIsVerified(true);
-      setIsPasswordModalOpen(false);
-      setPasswordInput("");
-      setPasswordError(false);
-      if (pendingAction) {
-        executeAction(pendingAction);
-        setPendingAction(null);
-      }
-    } else {
-      setPasswordError(true);
-    }
-  };
-
-  // Load custom projects from MongoDB on mount
   useEffect(() => {
-    const handleAddFromPalette = () => handleAuthTrigger({ type: "ADD" });
+    const handleAddFromPalette = () => router.push("/dashboard");
     const handleDBCheck = async () => {
       const dbProjects = await getProjects();
       if (dbProjects) {
-        alert(`🚀 Database Status: ONLINE\n📁 Projects Found: ${dbProjects.length}`);
+        alert(`Database Status: ONLINE\nProjects Found: ${dbProjects.length}`);
       } else {
-        alert("⚠️ Database Status: OFFLINE or UNREACHABLE");
+        alert("Database Status: OFFLINE or UNREACHABLE");
       }
     };
 
@@ -162,16 +84,15 @@ export default function Home() {
       window.removeEventListener("trigger-add-project", handleAddFromPalette);
       window.removeEventListener("trigger-db-check", handleDBCheck);
     };
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const loadProjects = async () => {
       try {
         const dbProjects = await getProjects();
         if (dbProjects && dbProjects.length > 0) {
-          setCustomProjects(dbProjects as CustomProject[]);
+          setCustomProjects(dbProjects);
         } else {
-          // If DB is empty, use defaults array, push to DB, then set state
           const initialDefaults = defaultProjects.map(p => ({
             title: p.title,
             description: p.description,
@@ -182,12 +103,12 @@ export default function Home() {
             repoLink: p.repoLink,
           }));
 
-          const addedWithIds = [];
+          const addedWithIds: any[] = [];
           for (const proj of initialDefaults) {
             const res = await addProject(proj);
             if (res.success) addedWithIds.push({ ...proj, id: res.id });
           }
-          setCustomProjects(addedWithIds as CustomProject[]);
+          setCustomProjects(addedWithIds);
         }
       } catch (e) {
         console.error("Failed to load projects", e);
@@ -196,39 +117,9 @@ export default function Home() {
     loadProjects();
   }, []);
 
-  const saveProject = async (project: CustomProject) => {
-    const isExisting = project.id && !project.id.startsWith("custom-");
-    // ^ our previous local storage mock IDs were 'custom-...'. Now we use actual MongoDB IDs.
-
-    let updated;
-    const { id, ...dataToSave } = project;
-
-    if (isExisting) {
-      // update in DB
-      const res = await updateProject(id as string, dataToSave);
-      if (res.success) {
-        updated = customProjects.map((p) => (p.id === id ? project : p));
-        setCustomProjects(updated);
-      } else {
-        alert("Failed to update project in DB.");
-      }
-    } else {
-      // create new in DB
-      const res = await addProject(dataToSave);
-      if (res.success) {
-        const fullProject = { ...dataToSave, id: res.id };
-        updated = [...customProjects, fullProject];
-        setCustomProjects(updated as CustomProject[]);
-      } else {
-        alert("Failed to add project to DB.");
-      }
-    }
-  };
-
-
   return (
     <main className="min-h-screen relative selection:bg-foreground/10">
-      <Navbar onAddProject={() => handleAuthTrigger({ type: "ADD" })} />
+      <Navbar />
 
       <Hero />
       
@@ -254,92 +145,9 @@ export default function Home() {
         <GsapReveal delay={0.2}>
           <ProjectHoverList
             projects={customProjects}
-            onEdit={(project) => handleAuthTrigger({ type: "EDIT", project })}
-            onDelete={(id) => handleAuthTrigger({ type: "DELETE", id })}
           />
         </GsapReveal>
       </section>
-
-
-
-      {/* Password Verification Modal */}
-      <AnimatePresence>
-        {isPasswordModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          >
-            <motion.div
-              initial={{ backdropFilter: "blur(0px)" }}
-              animate={{ backdropFilter: "blur(12px)" }}
-              className="absolute inset-0 bg-background/70"
-              onClick={() => setIsPasswordModalOpen(false)}
-            />
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="glass-card w-full max-w-sm rounded-3xl relative z-10 border border-border/50 shadow-2xl p-8"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex flex-col items-center text-center mb-6">
-                <div className="w-14 h-14 rounded-2xl bg-foreground/5 border border-border flex items-center justify-center mb-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-foreground/60"><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-                </div>
-                <h3 className="text-xl font-bold tracking-tight">Verify Owner</h3>
-                <p className="text-sm text-muted/60 mt-1">Enter the owner password to continue</p>
-              </div>
-
-              <div className="mb-4">
-                <input
-                  type="password"
-                  value={passwordInput}
-                  onChange={(e) => {
-                    setPasswordInput(e.target.value);
-                    setPasswordError(false);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handlePasswordSubmit();
-                  }}
-                  placeholder="Enter password..."
-                  autoFocus
-                  className={`w-full px-4 py-3 rounded-xl bg-foreground/[0.03] border ${passwordError ? "border-red-400/50" : "border-border"
-                    } text-foreground placeholder:text-muted/30 focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:border-foreground/20 transition-all text-sm text-center tracking-widest`}
-                />
-                {passwordError && (
-                  <p className="text-xs text-red-400 mt-2 text-center">Incorrect password. Access denied.</p>
-                )}
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setIsPasswordModalOpen(false)}
-                  className="flex-1 py-3 rounded-2xl border border-border text-sm font-semibold text-muted hover:text-foreground hover:bg-foreground/5 transition-all"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handlePasswordSubmit}
-                  className="flex-1 py-3 rounded-2xl bg-foreground text-background text-sm font-bold hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-xl"
-                >
-                  Verify
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Add Project Modal */}
-      <AddProjectModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onSave={saveProject}
-        initialData={editProjectData}
-      />
 
       {/* About Section */}
       <section id="about" className="py-24 px-6 max-w-6xl mx-auto overflow-hidden">

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ThemeToggle } from "./theme-toggle";
 
 const navItems = [
@@ -15,10 +15,11 @@ const navItems = [
     { name: "Contact", href: "#contact" },
 ];
 
-export function Navbar({ onAddProject }: { onAddProject: () => void }) {
+export function Navbar() {
     const [hoveredItem, setHoveredItem] = useState<string | null>(null);
     const [activeItem, setActiveItem] = useState("Home");
     const pathname = usePathname();
+    const router = useRouter();
 
     useEffect(() => {
         if (pathname === "/journey") {
@@ -94,9 +95,9 @@ export function Navbar({ onAddProject }: { onAddProject: () => void }) {
 
                 <div className="flex items-center gap-3 sm:gap-4 pl-3 sm:pl-6 border-l border-border flex-shrink-0">
                     <button 
-                        onClick={onAddProject}
+                        onClick={() => router.push('/dashboard')}
                         className="p-2 rounded-full hover:bg-foreground/5 transition-colors group relative"
-                        title="Add Project"
+                        title="Dashboard"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-foreground/70 group-hover:text-foreground transition-colors"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                     </button>

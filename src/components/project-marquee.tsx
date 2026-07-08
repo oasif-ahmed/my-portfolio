@@ -34,7 +34,7 @@ export function ProjectMarquee({ projects, onEdit, onDelete }: ProjectMarqueePro
                             liveLink={project.liveLink}
                             repoLink={project.repoLink}
                             onEdit={() => onEdit(project)}
-                            onDelete={() => onDelete(project.id)}
+                            onDelete={() => onDelete(project.id || "")}
                         />
                     </div>
                 ))}

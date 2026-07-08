@@ -11,8 +11,8 @@ import { CustomProject } from "./add-project-modal";
 
 interface ProjectHoverListProps {
   projects: CustomProject[];
-  onEdit: (project: CustomProject) => void;
-  onDelete: (id: string) => void;
+  onEdit?: (project: CustomProject) => void;
+  onDelete?: (id: string) => void;
 }
 
 const MotionImage = motion.create(Image);
@@ -399,26 +399,30 @@ export function ProjectHoverList({ projects, onEdit, onDelete }: ProjectHoverLis
                         >
                           <Github size={20} />
                         </a>
-                        <button
-                          onClick={() => {
-                            setIsModalOpen(false);
-                            onEdit(modalProject);
-                          }}
-                          className="p-3 rounded-xl border border-border hover:bg-foreground/5 text-muted hover:text-foreground transition-all"
-                          title="Edit project"
-                        >
-                          <Edit size={20} />
-                        </button>
-                        <button
-                          onClick={() => {
-                            setIsModalOpen(false);
-                            onDelete(modalProject.id);
-                          }}
-                          className="p-3 rounded-xl border border-border hover:bg-red-500/10 text-muted hover:text-red-400 transition-all"
-                          title="Delete project"
-                        >
-                          <Trash2 size={20} />
-                        </button>
+                        {onEdit && (
+                          <button
+                            onClick={() => {
+                              setIsModalOpen(false);
+                              onEdit(modalProject);
+                            }}
+                            className="p-3 rounded-xl border border-border hover:bg-foreground/5 text-muted hover:text-foreground transition-all"
+                            title="Edit project"
+                          >
+                            <Edit size={20} />
+                          </button>
+                        )}
+                        {onDelete && modalProject.id && (
+                          <button
+                            onClick={() => {
+                              setIsModalOpen(false);
+                              onDelete(modalProject.id!);
+                            }}
+                            className="p-3 rounded-xl border border-border hover:bg-red-500/10 text-muted hover:text-red-400 transition-all"
+                            title="Delete project"
+                          >
+                            <Trash2 size={20} />
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>

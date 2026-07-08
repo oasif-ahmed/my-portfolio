@@ -28,7 +28,7 @@ export function CommandPalette() {
         { id: "journey", name: "My Journey", icon: <Terminal className="w-4 h-4" />, action: () => scrollToSection("journey"), category: "Navigation" },
         { id: "about", name: "About Me", icon: <User className="w-4 h-4" />, action: () => scrollToSection("about"), category: "Navigation" },
         { id: "contact", name: "Contact Me", icon: <Mail className="w-4 h-4" />, action: () => scrollToSection("contact"), category: "Navigation" },
-        { id: "add", name: "Add New Project", icon: <Plus className="w-4 h-4" />, action: () => window.dispatchEvent(new CustomEvent("trigger-add-project")), category: "Management" },
+        { id: "add", name: "Dashboard", icon: <Plus className="w-4 h-4" />, action: () => window.dispatchEvent(new CustomEvent("trigger-add-project")), category: "Management" },
         { id: "theme", name: `Switch to ${theme === "dark" ? "Light" : "Dark"} Mode`, icon: theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />, action: () => setTheme(theme === "dark" ? "light" : "dark"), category: "System" },
         { id: "db", name: "Database Connectivity Check", icon: <Database className="w-4 h-4" />, action: () => window.dispatchEvent(new CustomEvent("trigger-db-check")), category: "System" },
     ];
