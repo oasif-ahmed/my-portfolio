@@ -5,8 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
 import { GsapReveal } from "./gsap-reveal";
 import { IconType } from "react-icons";
-import { getSkills, addSkill } from "@/actions/skills";
-import { getIcon, allIcons } from "@/lib/icons";
+import { getIcon } from "@/lib/icons";
 
 interface Skill {
     name: string;
@@ -81,31 +80,15 @@ const defaultSkills: Skill[] = [
     { name: "Figma", icon: getIcon("SiFigma")!, level: 70 },
 ];
 
-export function SkillsGrid() {
+interface SkillsGridProps {
+    initialSkills?: Skill[];
+}
+
+export function SkillsGrid({ initialSkills }: SkillsGridProps) {
     const positionRefs = useRef<(HTMLDivElement | null)[]>([]);
     const animateRefs = useRef<(HTMLDivElement | null)[]>([]);
     const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-    const [skills, setSkills] = useState<Skill[]>(defaultSkills);
-
-    useEffect(() => {
-        const load = async () => {
-            const data = await getSkills();
-            if (data && data.length > 0) {
-                setSkills(data.map((s) => ({
-                    name: s.name,
-                    icon: getIcon(s.icon) || getIcon("SiReact")!,
-                    level: s.level,
-                })));
-            } else {
-                for (const s of defaultSkills) {
-                    const iconEntry = Object.entries(allIcons).find(([, v]) => v === s.icon);
-                    const iconName = iconEntry ? iconEntry[0] : "SiReact";
-                    await addSkill({ name: s.name, icon: iconName, level: s.level });
-                }
-            }
-        };
-        load();
-    }, []);
+    const [skills, setSkills] = useState<Skill[]>(initialSkills ?? defaultSkills);
 
     const [dims, setDims] = useState({ cellW: 108, cellH: 95, iconSize: 84 });
 
