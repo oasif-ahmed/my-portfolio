@@ -22,7 +22,7 @@ export function GithubCalendar() {
         light: resolvedTheme === "cream" 
             ? ["#efeadb", "#c6e48b", "#7bc96f", "#239a3b", "#196127"]
             : ["#f0f0f0", "#c6e48b", "#7bc96f", "#239a3b", "#196127"],
-        dark: ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"],
+        dark: ["#0a0a0a", "#0e4429", "#006d32", "#26a641", "#39d353"],
     };
 
     return (
