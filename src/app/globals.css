@@ -32,19 +32,19 @@
 }
 
 .dark {
-  --background: #050505;
-  --foreground: #fafafa;
-  --surface: #0a0a0a;
-  --muted: #a3a3a3;
-  --border: rgba(255, 255, 255, 0.1);
-  --glass-bg: rgba(10, 10, 10, 0.3);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-card-start: rgba(255, 255, 255, 0.05);
+  --background: #0d1117;
+  --foreground: #f0f0f0;
+  --surface: #161b22;
+  --muted: #8b949e;
+  --border: rgba(255, 255, 255, 0.08);
+  --glass-bg: rgba(22, 27, 34, 0.3);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-card-start: rgba(255, 255, 255, 0.04);
   --glass-card-end: rgba(255, 255, 255, 0);
-  --glass-card-border: rgba(255, 255, 255, 0.08);
-  --scrollbar-track: #050505;
-  --scrollbar-thumb: #262626;
-  --scrollbar-hover: #404040;
+  --glass-card-border: rgba(255, 255, 255, 0.06);
+  --scrollbar-track: #0d1117;
+  --scrollbar-thumb: #30363d;
+  --scrollbar-hover: #484f58;
 }
 
 .cream {
