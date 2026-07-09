@@ -71,9 +71,10 @@ interface HomePageProps {
   initialSkills?: { name: string; icon: string; level: number }[];
   initialJourney?: { title: string; period: string; description: string; highlights?: string[]; icons: string[] }[];
   initialCertificates?: { title: string; issuer: string; date: string; image: string; credentialUrl?: string }[];
+  resumeUrl?: string;
 }
 
-export default function Home({ initialSkills, initialJourney, initialCertificates }: HomePageProps) {
+export default function Home({ initialSkills, initialJourney, initialCertificates, resumeUrl }: HomePageProps) {
   const router = useRouter();
   const [customProjects, setCustomProjects] = useState<any[]>([]);
 
@@ -223,11 +224,14 @@ export default function Home({ initialSkills, initialJourney, initialCertificate
                   When I’m not at my desk, you’ll find me in the world of motorsports, admiring the engineering of a fast car, or gaming to stay sharp.
                 </p>
 
-                <button className="px-8 py-3 rounded-full bg-foreground text-background font-bold hover:opacity-90 transition-opacity flex items-center gap-2">
-                  <a href='https://drive.google.com/file/d/1u1eJkYcgpB14Nss5f-SOgRH9sSQ3frOy/view?usp=drive_link' target="_blank" rel="noopener noreferrer">
-                    <BulgeText text="Resume" />
-                  </a>
-                </button>
+                <a
+                  href={resumeUrl || 'https://drive.google.com/file/d/1u1eJkYcgpB14Nss5f-SOgRH9sSQ3frOy/view?usp=drive_link'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-8 py-3 rounded-full bg-foreground text-background font-bold hover:opacity-90 transition-opacity flex items-center gap-2"
+                >
+                  <BulgeText text="Resume" />
+                </a>
               </div>
             </GsapReveal>
           </div>
