@@ -14,7 +14,7 @@ import { GsapReveal } from "@/components/gsap-reveal";
 import { CertificatesCarousel } from "@/components/certificates-carousel";
 import { BulgeText } from "@/components/bulge-text";
 
-import { Mail, Copy, Github, Linkedin, Twitter, Phone, MessageCircle } from "lucide-react";
+import { Mail, Copy, Github, Linkedin, Twitter, Phone, MessageCircle, ExternalLink } from "lucide-react";
 import { getProjects, addProject } from "@/actions/projects";
 import { getResumeUrl } from "@/actions/resume";
 import { getIcon } from "@/lib/icons";
@@ -233,8 +233,9 @@ export default function Home({ initialSkills, initialJourney, initialCertificate
                   href={resumeUrl || 'https://drive.google.com/file/d/1u1eJkYcgpB14Nss5f-SOgRH9sSQ3frOy/view?usp=drive_link'}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-8 py-3 rounded-full bg-foreground text-background font-bold hover:opacity-90 transition-opacity flex items-center gap-2"
+                  className="w-full sm:w-auto px-6 sm:px-8 py-4 rounded-full bg-foreground text-background font-bold hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2 group"
                 >
+                  <ExternalLink className="w-5 h-5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                   <BulgeText text="Resume" />
                 </a>
               </div>
