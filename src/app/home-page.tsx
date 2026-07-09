@@ -16,6 +16,7 @@ import { BulgeText } from "@/components/bulge-text";
 
 import { Mail, Copy, Github, Linkedin, Twitter, Phone, MessageCircle } from "lucide-react";
 import { getProjects, addProject } from "@/actions/projects";
+import { getResumeUrl } from "@/actions/resume";
 import { getIcon } from "@/lib/icons";
 import { IconType } from "react-icons";
 
@@ -71,12 +72,16 @@ interface HomePageProps {
   initialSkills?: { name: string; icon: string; level: number }[];
   initialJourney?: { title: string; period: string; description: string; highlights?: string[]; icons: string[] }[];
   initialCertificates?: { title: string; issuer: string; date: string; image: string; credentialUrl?: string }[];
-  resumeUrl?: string;
 }
 
-export default function Home({ initialSkills, initialJourney, initialCertificates, resumeUrl }: HomePageProps) {
+export default function Home({ initialSkills, initialJourney, initialCertificates }: HomePageProps) {
   const router = useRouter();
   const [customProjects, setCustomProjects] = useState<any[]>([]);
+  const [resumeUrl, setResumeUrl] = useState("");
+
+  useEffect(() => {
+    getResumeUrl().then(setResumeUrl);
+  }, []);
 
   useEffect(() => {
     const handleAddFromPalette = () => router.push("/dashboard");
