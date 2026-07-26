@@ -10,10 +10,10 @@ interface JourneyItem {
     period: string;
     description: string;
     highlights?: string[];
-    icons: React.ElementType[];
+    icons: React.ComponentType<{ size?: number }>[];
 }
 
-function IconBulge({ Icon }: { Icon: React.ElementType }) {
+function IconBulge({ Icon }: { Icon: React.ComponentType<{ size?: number }> }) {
     const ref = useRef<HTMLDivElement>(null);
 
     const handleEnter = useCallback(() => {

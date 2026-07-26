@@ -12,6 +12,8 @@ import { GithubCalendar } from "@/components/github-calendar";
 import { ProjectHoverList } from "@/components/project-hover-list";
 import { GsapReveal } from "@/components/gsap-reveal";
 import { CertificatesCarousel } from "@/components/certificates-carousel";
+import { CertFlowingMenu } from "@/components/cert-flowing-menu";
+import { CertHoverList } from "@/components/cert-hover-list";
 import { BulgeText } from "@/components/bulge-text";
 
 import { Mail, Copy, Github, Linkedin, Twitter, Phone, MessageCircle, ExternalLink } from "lucide-react";
@@ -180,7 +182,7 @@ export default function Home({ initialSkills, initialJourney, initialCertificate
       </section>
 
       {initialCertificates && initialCertificates.length > 0 && (
-        <CertificatesCarousel certificates={initialCertificates} />
+        <CertHoverList certificates={initialCertificates} />
       )}
 
       {/* About Section */}
@@ -233,7 +235,7 @@ export default function Home({ initialSkills, initialJourney, initialCertificate
                   href={resumeUrl || 'https://drive.google.com/file/d/1u1eJkYcgpB14Nss5f-SOgRH9sSQ3frOy/view?usp=drive_link'}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full sm:w-auto px-6 sm:px-8 py-4 rounded-full bg-foreground text-background font-bold hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2 group"
+                  className="w-auto px-10 py-2 rounded-full bg-foreground text-background font-bold hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2 group"
                 >
                   <ExternalLink className="w-5 h-5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                   <BulgeText text="Resume" />

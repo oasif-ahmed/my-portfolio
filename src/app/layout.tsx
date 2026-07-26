@@ -7,6 +7,7 @@ import { DotBackground } from "@/components/dot-background";
 import { CustomCursor } from "@/components/custom-cursor";
 import { CommandPalette } from "@/components/command-palette";
 import { SmoothScroll } from "@/components/smooth-scroll";
+import { ClickSparkProvider } from "@/components/click-spark-provider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -24,13 +25,15 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning className={`${inter.variable} font-sans antialiased bg-background text-foreground transition-colors duration-300`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem themes={["light", "dark", "cream"]}>
-          <CustomCursor />
-          <GridBackground />
-          <DotBackground />
-          <CommandPalette />
-          <SmoothScroll>
-            {children}
-          </SmoothScroll>
+          <ClickSparkProvider>
+            <CustomCursor />
+            <GridBackground />
+            <DotBackground />
+            <CommandPalette />
+            <SmoothScroll>
+              {children}
+            </SmoothScroll>
+          </ClickSparkProvider>
         </ThemeProvider>
       </body>
     </html>

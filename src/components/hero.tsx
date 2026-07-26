@@ -2,11 +2,10 @@
 
 import React from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { TypeAnimation } from "react-type-animation";
 import { ArrowUpRight, Github } from "lucide-react";
 import Image from "next/image";
 import { BulgeText } from "./bulge-text";
-import { MagnifierText } from "./magnifier-text";
+import TextPressure from "./TextPressure";
 
 export function Hero() {
     const x = useMotionValue(0);
@@ -128,49 +127,35 @@ export function Hero() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6"
+                    className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6 text-center"
                 >
-                    Hello, I&apos;m{" "}
-                    <span className="text-foreground block mt-2">
-                        <MagnifierText text="OASIF AHMED RIKTO." className="cursor-none" zoom={2.5} lensRadius={70} />
-                    </span>
+                    Hello, I&apos;m
                 </motion.h1>
 
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-2xl md:text-3xl lg:text-4xl font-bold text-muted mb-10 h-[1.2em]"
+                    transition={{ delay: 0.1 }}
+                    className="w-full mb-6"
+                    style={{ position: 'relative', height: '220px' }}
                 >
-                    <TypeAnimation
-                        sequence={[
-                            "Full Stack Developer.", 2000,
-                            "MERN Stack Developer.", 2000,
-                            "Frontend Developer.", 2000,
-                            "React.js Developer.", 2000,
-                            "JavaScript Developer.", 2000,
-                        ]}
-                        wrapper="span"
-                        speed={50}
-                        repeat={Infinity}
+                    <TextPressure
+                        text="OASIF AHMED RIKTO."
+                        flex={true}
+                        alpha={false}
+                        stroke={false}
+                        width={true}
+                        weight={true}
+                        italic={true}
+                        textColor="var(--foreground)"
+                        minFontSize={80}
                     />
                 </motion.div>
-
-                <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="max-w-2xl text-lg md:text-xl text-muted mb-12 leading-relaxed"
-                >
-                    I build <span className="text-foreground font-medium">accessible, pixel-perfect</span>, and{" "}
-                    <span className="text-foreground font-medium">scalable web apps</span>. Specializing in
-                    React, Next.js, and modern UI/UX architecture.
-                </motion.p>
 
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
+                    transition={{ delay: 0.3 }}
                     className="flex flex-wrap items-center justify-center gap-5"
                 >
                     <motion.a
