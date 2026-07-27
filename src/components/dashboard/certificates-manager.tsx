@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Plus, Edit3, Trash2, ExternalLink, Upload, X } from "lucide-react";
 import { getCertificates, addCertificate, updateCertificate, deleteCertificate, Certificate } from "@/actions/certificates";
 import { BulgeText } from "@/components/bulge-text";
+import { toast } from "sonner";
 
 export function CertificatesManager() {
   const [certs, setCerts] = useState<Certificate[]>([]);
@@ -66,21 +67,47 @@ export function CertificatesManager() {
   };
 
   const handleSave = async () => {
-    if (!title.trim() || !issuer.trim() || !date.trim() || !image) return;
-    const payload = { title: title.trim(), issuer: issuer.trim(), date: date.trim(), image, credentialUrl: credentialUrl.trim() };
-    if (editData?.id) {
-      await updateCertificate(editData.id, payload);
-    } else {
-      await addCertificate(payload);
+    if (!title.trim() || !issuer.trim() || !date.trim() || !image) {
+      toast.error("Please fill in all required fields and upload an image.");
+      return;
     }
-    resetForm();
-    load();
+    const payload = { title: title.trim(), issuer: issuer.trim(), date: date.trim(), image, credentialUrl: credentialUrl.trim() };
+    try {
+      if (editData?.id) {
+        const result = await updateCertificate(editData.id, payload);
+        if (result?.success === false) {
+          toast.error("Failed to update certificate.");
+          return;
+        }
+        toast.success("Certificate updated successfully.");
+      } else {
+        const result = await addCertificate(payload);
+        if (result?.success === false) {
+          toast.error("Failed to add certificate.");
+          return;
+        }
+        toast.success("Certificate added successfully.");
+      }
+      resetForm();
+      load();
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    }
   };
 
   const handleDelete = async (id: string) => {
     if (confirm("Delete this certificate?")) {
-      await deleteCertificate(id);
-      load();
+      try {
+        const result = await deleteCertificate(id);
+        if (result?.success === false) {
+          toast.error("Failed to delete certificate.");
+          return;
+        }
+        toast.success("Certificate deleted.");
+        load();
+      } catch {
+        toast.error("Something went wrong. Please try again.");
+      }
     }
   };
 

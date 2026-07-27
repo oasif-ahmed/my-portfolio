@@ -103,6 +103,7 @@ body {
         rgba(255, 255, 255, 0.8),
         transparent);
     z-index: 1;
+    pointer-events: none;
   }
 
   .glass::after {
@@ -117,6 +118,7 @@ body {
         transparent,
         rgba(255, 255, 255, 0.3));
     z-index: 1;
+    pointer-events: none;
   }
 
   .glass-card {
@@ -217,4 +219,10 @@ html.lenis body {
 
 .lenis.lenis-scrolling iframe {
   pointer-events: none;
+}
+
+/* Skill card brand color on hover */
+.skill-card:hover .skill-icon {
+  color: var(--brand);
+  filter: drop-shadow(0 0 8px var(--brand));
 }

@@ -6,6 +6,7 @@ import { Plus, X, Save, Trash2, Edit3, Sparkles, GripVertical } from "lucide-rea
 import { getJourney, addJourneyItem, updateJourneyItem, deleteJourneyItem, JourneyItem } from "@/actions/journey";
 import { getIcon, ALL_ICON_NAMES } from "@/lib/icons";
 import { BulgeText } from "@/components/bulge-text";
+import { toast } from "sonner";
 
 export function JourneyManager() {
   const [items, setItems] = useState<JourneyItem[]>([]);
@@ -54,7 +55,10 @@ export function JourneyManager() {
   };
 
   const handleSave = async () => {
-    if (!title.trim() || !period.trim() || !description.trim()) return;
+    if (!title.trim() || !period.trim() || !description.trim()) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
     const highlights = highlightsStr.split(",").map((s) => s.trim()).filter(Boolean);
     const data = {
       title: title.trim(),
@@ -64,19 +68,42 @@ export function JourneyManager() {
       icons,
       order,
     };
-    if (editingId) {
-      await updateJourneyItem(editingId, data);
-    } else {
-      await addJourneyItem(data);
+    try {
+      if (editingId) {
+        const result = await updateJourneyItem(editingId, data);
+        if (result?.success === false) {
+          toast.error("Failed to update entry.");
+          return;
+        }
+        toast.success("Entry updated successfully.");
+      } else {
+        const result = await addJourneyItem(data);
+        if (result?.success === false) {
+          toast.error("Failed to add entry.");
+          return;
+        }
+        toast.success("Entry added successfully.");
+      }
+      resetForm();
+      loadItems();
+    } catch {
+      toast.error("Something went wrong. Please try again.");
     }
-    resetForm();
-    loadItems();
   };
 
   const handleDelete = async (id: string) => {
     if (confirm("Delete this journey entry?")) {
-      await deleteJourneyItem(id);
-      loadItems();
+      try {
+        const result = await deleteJourneyItem(id);
+        if (result?.success === false) {
+          toast.error("Failed to delete entry.");
+          return;
+        }
+        toast.success("Entry deleted.");
+        loadItems();
+      } catch {
+        toast.error("Something went wrong. Please try again.");
+      }
     }
   };
 

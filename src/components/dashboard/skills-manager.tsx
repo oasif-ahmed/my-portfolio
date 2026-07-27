@@ -6,6 +6,7 @@ import { Plus, X, Save, Trash2, Edit3, Sparkles, Search } from "lucide-react";
 import { getSkills, addSkill, updateSkill, deleteSkill, Skill } from "@/actions/skills";
 import { getIcon, ALL_ICON_NAMES } from "@/lib/icons";
 import { BulgeText } from "@/components/bulge-text";
+import { toast } from "sonner";
 
 export function SkillsManager() {
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -46,21 +47,58 @@ export function SkillsManager() {
   };
 
   const handleSave = async () => {
-    if (!name.trim()) return;
-    const data = { name: name.trim(), icon, level };
-    if (editingId) {
-      await updateSkill(editingId, data);
-    } else {
-      await addSkill(data);
+    if (!name.trim()) {
+      toast.error("Please enter a skill name.");
+      return;
     }
-    resetForm();
-    loadSkills();
+
+    const trimmedName = name.trim();
+    const isDuplicate = skills.some(
+      (s) => s.name.toLowerCase() === trimmedName.toLowerCase() && s.id !== editingId
+    );
+
+    if (isDuplicate) {
+      toast.error(`Skill "${trimmedName}" is already added.`);
+      return;
+    }
+
+    const data = { name: trimmedName, icon, level };
+    try {
+      if (editingId) {
+        const result = await updateSkill(editingId, data);
+        if (result?.success === false) {
+          toast.error("Failed to update skill.");
+          return;
+        }
+        toast.success("Skill updated successfully.");
+      } else {
+        const result = await addSkill(data);
+        if (result?.success === false) {
+          toast.error("Failed to add skill.");
+          return;
+        }
+        toast.success("Skill added successfully.");
+      }
+      resetForm();
+      loadSkills();
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    }
   };
 
   const handleDelete = async (id: string) => {
     if (confirm("Delete this skill?")) {
-      await deleteSkill(id);
-      loadSkills();
+      try {
+        const result = await deleteSkill(id);
+        if (result?.success === false) {
+          toast.error("Failed to delete skill.");
+          return;
+        }
+        toast.success("Skill deleted.");
+        loadSkills();
+      } catch {
+        toast.error("Something went wrong. Please try again.");
+      }
     }
   };
 
@@ -183,7 +221,7 @@ export function SkillsManager() {
                       <SkillIcon className="w-5 h-5 text-muted" />
                     </div>
                   )}
-                  <div>
+              <div>
                     <p className="text-sm font-bold">{skill.name}</p>
                     <div className="w-24 h-1.5 rounded-full bg-foreground/10 mt-1 overflow-hidden">
                       <div className="h-full rounded-full bg-foreground/40" style={{ width: `${skill.level}%` }} />

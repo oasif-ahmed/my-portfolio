@@ -5,6 +5,7 @@ import { Plus, Edit3, Trash2, ExternalLink, Github } from "lucide-react";
 import { AddProjectModal } from "@/components/add-project-modal";
 import { getProjects, addProject, updateProject, deleteProject, CustomProject } from "@/actions/projects";
 import { BulgeText } from "@/components/bulge-text";
+import { toast } from "sonner";
 
 export function ProjectsManager() {
   const [projects, setProjects] = useState<CustomProject[]>([]);
@@ -25,20 +26,43 @@ export function ProjectsManager() {
 
   const handleSave = async (project: CustomProject) => {
     const { id, ...dataToSave } = project;
-    if (id && projects.find((p) => p.id === id)) {
-      await updateProject(id, dataToSave);
-    } else {
-      await addProject(dataToSave);
+    try {
+      if (id && projects.find((p) => p.id === id)) {
+        const result = await updateProject(id, dataToSave);
+        if (result?.success === false) {
+          toast.error("Failed to update project.");
+          return;
+        }
+        toast.success("Project updated successfully.");
+      } else {
+        const result = await addProject(dataToSave);
+        if (result?.success === false) {
+          toast.error("Failed to add project.");
+          return;
+        }
+        toast.success("Project added successfully.");
+      }
+      setIsModalOpen(false);
+      setEditData(null);
+      loadProjects();
+    } catch {
+      toast.error("Something went wrong. Please try again.");
     }
-    setIsModalOpen(false);
-    setEditData(null);
-    loadProjects();
   };
 
   const handleDelete = async (id: string) => {
     if (confirm("Delete this project?")) {
-      await deleteProject(id);
-      loadProjects();
+      try {
+        const result = await deleteProject(id);
+        if (result?.success === false) {
+          toast.error("Failed to delete project.");
+          return;
+        }
+        toast.success("Project deleted.");
+        loadProjects();
+      } catch {
+        toast.error("Something went wrong. Please try again.");
+      }
     }
   };
 

@@ -129,18 +129,18 @@ export function Hero() {
                     transition={{ delay: 0.1 }}
                     className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6 text-center"
                 >
-                    Hello, I&apos;m
+                    Hello, I am
                 </motion.h1>
 
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="w-full mb-6"
+                    className="w-full mb-2"
                     style={{ position: 'relative', height: '220px' }}
                 >
                     <TextPressure
-                        text="OASIF AHMED RIKTO."
+                        text="OASIF AHMED RIKTO"
                         flex={true}
                         alpha={false}
                         stroke={false}
@@ -151,6 +151,15 @@ export function Hero() {
                         minFontSize={80}
                     />
                 </motion.div>
+
+                <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.25 }}
+                    className="text-lg md:text-xl text-muted max-w-lg mb-8 leading-relaxed"
+                >
+                    A <span className="text-foreground font-semibold">Full Stack Developer</span> who loves building modern web applications and turning complex problems into elegant solutions.
+                </motion.p>
 
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}

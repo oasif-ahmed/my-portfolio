@@ -21,8 +21,9 @@ const defaultSkills = [
     { name: "JWT", icon: "SiJsonwebtokens", level: 90 },
     { name: "Python", icon: "SiPython", level: 80 },
     { name: "C++", icon: "SiCplusplus", level: 70 },
-    { name: "Docker", icon: "SiDocker", level: 60 },
     { name: "Git", icon: "SiGit", level: 85 },
+    { name: "GitHub", icon: "SiGithub", level: 85 },
+    { name: "Docker", icon: "SiDocker", level: 60 },
     { name: "Figma", icon: "SiFigma", level: 70 },
 ];
 

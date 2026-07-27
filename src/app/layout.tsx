@@ -8,6 +8,7 @@ import { CustomCursor } from "@/components/custom-cursor";
 import { CommandPalette } from "@/components/command-palette";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { ClickSparkProvider } from "@/components/click-spark-provider";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -24,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning className={`${inter.variable} font-sans antialiased bg-background text-foreground transition-colors duration-300`}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem themes={["light", "dark", "cream"]}>
+        <ThemeProvider attribute="class" defaultTheme="cream" enableSystem themes={["light", "dark", "cream"]}>
           <ClickSparkProvider>
             <CustomCursor />
             <GridBackground />
@@ -33,6 +34,7 @@ export default function RootLayout({
             <SmoothScroll>
               {children}
             </SmoothScroll>
+            <Toaster position="bottom-right" richColors />
           </ClickSparkProvider>
         </ThemeProvider>
       </body>

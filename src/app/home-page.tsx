@@ -11,8 +11,6 @@ import { Journey } from "@/components/journey";
 import { GithubCalendar } from "@/components/github-calendar";
 import { ProjectHoverList } from "@/components/project-hover-list";
 import { GsapReveal } from "@/components/gsap-reveal";
-import { CertificatesCarousel } from "@/components/certificates-carousel";
-import { CertFlowingMenu } from "@/components/cert-flowing-menu";
 import { CertHoverList } from "@/components/cert-hover-list";
 import { BulgeText } from "@/components/bulge-text";
 
@@ -182,7 +180,20 @@ export default function Home({ initialSkills, initialJourney, initialCertificate
       </section>
 
       {initialCertificates && initialCertificates.length > 0 && (
-        <CertHoverList certificates={initialCertificates} />
+        <section id="certificates" className="py-24 overflow-hidden">
+          <div className="px-6 max-w-6xl mx-auto mb-12">
+            <GsapReveal>
+              <div className="flex items-center gap-4">
+                <span className="text-2xl opacity-50 font-mono">{"!_"}</span>
+                <h2 className="text-3xl font-bold tracking-tight">Certificates</h2>
+              </div>
+            </GsapReveal>
+          </div>
+
+          <GsapReveal delay={0.2}>
+            <CertHoverList certificates={initialCertificates} />
+          </GsapReveal>
+        </section>
       )}
 
       {/* About Section */}
