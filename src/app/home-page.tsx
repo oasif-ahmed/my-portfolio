@@ -13,6 +13,7 @@ import { ProjectHoverList } from "@/components/project-hover-list";
 import { GsapReveal } from "@/components/gsap-reveal";
 import { CertHoverList } from "@/components/cert-hover-list";
 import { BulgeText } from "@/components/bulge-text";
+import { ElectricBorder } from "@/components/electric-border";
 
 import { Mail, Copy, Github, Linkedin, Twitter, Phone, MessageCircle, ExternalLink } from "lucide-react";
 import { getProjects, addProject } from "@/actions/projects";
@@ -203,21 +204,23 @@ export default function Home({ initialSkills, initialJourney, initialCertificate
           <div className="w-full md:w-1/2 flex justify-center md:justify-end order-1 md:order-none">
             <GsapReveal>
               <div className="relative group w-full max-w-[280px] mx-auto md:mr-0">
-                <div
-                  className="relative overflow-hidden w-full flex items-center justify-center text-center"
-                  style={{
-                    maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)',
-                    WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)'
-                  }}
-                >
-                  <Image
-                    src="/profile.png"
-                    alt="Oasif Ahmed Rikto"
-                    width={400}
-                    height={400}
-                    className="w-full h-auto object-contain transition-transform duration-1000 group-hover:scale-105 scale-x-[-1]"
-                  />
-                </div>
+                <ElectricBorder color="#5227FF" speed={1.2} chaos={0.15} borderRadius={16}>
+                  <div
+                    className="relative overflow-hidden w-full flex items-center justify-center text-center"
+                    style={{
+                      maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)',
+                      WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)'
+                    }}
+                  >
+                    <Image
+                      src="/profile.png"
+                      alt="Oasif Ahmed Rikto"
+                      width={400}
+                      height={400}
+                      className="w-full h-auto object-contain transition-transform duration-1000 group-hover:scale-105 scale-x-[-1]"
+                    />
+                  </div>
+                </ElectricBorder>
               </div>
             </GsapReveal>
           </div>
