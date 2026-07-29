@@ -4,7 +4,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, ExternalLink, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ArrowUpRight, ExternalLink, X } from "lucide-react";
+import { useLenis } from "lenis/react";
 import gsap from "gsap";
 
 interface Certificate {
@@ -30,38 +31,50 @@ export function CertHoverList({ certificates }: CertHoverListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const floatingRef = useRef<HTMLDivElement>(null);
   const mouseRef = useRef({ x: 0, y: 0, lastX: 0 });
+  const lenis = useLenis();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  // Sync GSAP floating element positioning on mousemove
   useEffect(() => {
     const container = containerRef.current;
     const floating = floatingRef.current;
     if (!container || !floating || window.innerWidth < 1024) return;
 
+    // Set initial state
     gsap.set(floating, { scale: 0.8, opacity: 0, xPercent: -50, yPercent: -50 });
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = container.getBoundingClientRect();
+      // Ensure cursor is within container bounds
       if (
         e.clientX < rect.left ||
         e.clientX > rect.right ||
         e.clientY < rect.top ||
         e.clientY > rect.bottom
       ) {
-        gsap.to(floating, { opacity: 0, scale: 0.8, duration: 0.35, ease: "power2.out" });
+        // Fade out if outside container
+        gsap.to(floating, {
+          opacity: 0,
+          scale: 0.8,
+          duration: 0.35,
+          ease: "power2.out",
+        });
         return;
       }
 
+      // Calculate velocity for premium dynamic tilting
       const dx = e.clientX - mouseRef.current.lastX;
       mouseRef.current.lastX = e.clientX;
       const rotation = gsap.utils.clamp(-12, 12, dx * 0.15);
 
+      // Animate floating element to mouse coordinates with inertial lag
       gsap.to(floating, {
         x: e.clientX,
         y: e.clientY,
-        rotation,
+        rotation: rotation,
         opacity: 1,
         scale: 1,
         duration: 0.5,
@@ -71,7 +84,12 @@ export function CertHoverList({ certificates }: CertHoverListProps) {
     };
 
     const handleMouseLeave = () => {
-      gsap.to(floating, { opacity: 0, scale: 0.8, duration: 0.35, ease: "power2.out" });
+      gsap.to(floating, {
+        opacity: 0,
+        scale: 0.8,
+        duration: 0.35,
+        ease: "power2.out",
+      });
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -83,11 +101,38 @@ export function CertHoverList({ certificates }: CertHoverListProps) {
     };
   }, [hoveredIndex]);
 
+  // Handle ESC key to close modal
+  useEffect(() => {
+    if (!isModalOpen) return;
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsModalOpen(false);
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => {
+      window.removeEventListener("keydown", handleEsc);
+    };
+  }, [isModalOpen]);
+
+  // Stop Lenis when modal is open so the modal content can scroll natively
+  useEffect(() => {
+    if (!lenis) return;
+    if (isModalOpen) {
+      lenis.stop();
+    } else {
+      lenis.start();
+    }
+  }, [isModalOpen, lenis]);
+
   if (!certificates || certificates.length === 0) return null;
+
+  const handleItemClick = (cert: Certificate) => {
+    setModalCert(cert);
+    setIsModalOpen(true);
+  };
 
   return (
     <div className="relative w-full max-w-6xl mx-auto px-6 py-12" ref={containerRef}>
-      {/* Floating Image Preview */}
+      {/* Floating Image Preview (follows mouse) */}
       <div
         ref={floatingRef}
         className="fixed top-0 left-0 w-[420px] h-[260px] pointer-events-none z-[60] overflow-hidden rounded-2xl border border-border/40 bg-surface shadow-[0_30px_70px_-15px_rgba(0,0,0,0.6)] hidden lg:block"
@@ -114,6 +159,7 @@ export function CertHoverList({ certificates }: CertHoverListProps) {
           )}
         </AnimatePresence>
 
+        {/* Floating View Certificate Circle Overlay */}
         <div className="absolute inset-0 bg-background/10 backdrop-blur-[1px] flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
           <div className="w-24 h-24 rounded-full bg-background/95 backdrop-blur-md border border-border/60 flex flex-col items-center justify-center shadow-2xl scale-95 animate-pulse">
             <span className="text-[10px] font-black uppercase tracking-widest text-foreground">View</span>
@@ -132,17 +178,18 @@ export function CertHoverList({ certificates }: CertHoverListProps) {
           return (
             <div
               key={cert.title + index}
-              onClick={() => {
-                setModalCert(cert);
-                setIsModalOpen(true);
+              onClick={() => handleItemClick(cert)}
+              onMouseEnter={() => {
+                setHoveredIndex(index);
               }}
-              onMouseEnter={() => setHoveredIndex(index)}
-              onMouseLeave={() => setHoveredIndex(null)}
+              onMouseLeave={() => {
+                setHoveredIndex(null);
+              }}
               className={`group flex flex-col md:flex-row md:items-center justify-between py-10 md:py-14 border-b border-border/30 cursor-pointer transition-opacity duration-300 ${
                 isAnyHovered && !isHovered ? "opacity-30" : "opacity-100"
               }`}
             >
-              {/* Left: Index & Title */}
+              {/* Left Column: Index & Title */}
               <div className="flex items-center gap-6 md:gap-10 flex-1">
                 <span className="text-sm md:text-base font-mono opacity-50 text-muted group-hover:text-foreground transition-colors">
                   {displayIndex}
@@ -152,7 +199,7 @@ export function CertHoverList({ certificates }: CertHoverListProps) {
                 </h3>
               </div>
 
-              {/* Center: Issuer & Date */}
+              {/* Center-Right Column: Issuer & Date */}
               <div className="flex flex-wrap gap-2 mt-4 md:mt-0 md:px-8 max-w-sm transition-transform duration-500 group-hover:translate-x-4">
                 <span className="px-2.5 py-1 rounded-md bg-foreground/5 border border-border text-[9px] uppercase font-bold tracking-widest text-muted/80">
                   {cert.issuer}
@@ -164,32 +211,19 @@ export function CertHoverList({ certificates }: CertHoverListProps) {
                 )}
               </div>
 
-              {/* Right: View Link */}
+              {/* Right Column: View Certificate Link */}
               <div className="flex items-center justify-between md:justify-end gap-6 mt-6 md:mt-0">
-                {cert.credentialUrl ? (
-                  <a
-                    href={cert.credentialUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="text-sm font-semibold tracking-wider uppercase text-muted group-hover:text-foreground transition-colors flex items-center gap-2"
-                  >
-                    View Credential
-                    <ArrowUpRight size={18} className="transform group-hover:rotate-45 transition-transform duration-300" />
-                  </a>
-                ) : (
-                  <span className="text-sm font-semibold tracking-wider uppercase text-muted group-hover:text-foreground transition-colors flex items-center gap-2">
-                    View Certificate
-                    <ArrowUpRight size={18} className="transform group-hover:rotate-45 transition-transform duration-300" />
-                  </span>
-                )}
+                <span className="text-sm font-semibold tracking-wider uppercase text-muted group-hover:text-foreground transition-colors flex items-center gap-2">
+                  View Certificate
+                  <ArrowUpRight size={18} className="transform group-hover:rotate-45 transition-transform duration-300" />
+                </span>
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* Modal */}
+      {/* Reusable Certificate Detailed Modal */}
       {mounted &&
         modalCert &&
         createPortal(
@@ -201,6 +235,7 @@ export function CertHoverList({ certificates }: CertHoverListProps) {
                 exit={{ opacity: 0 }}
                 className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-8"
               >
+                {/* Backdrop */}
                 <motion.div
                   initial={{ backdropFilter: "blur(0px)" }}
                   animate={{ backdropFilter: "blur(8px)" }}
@@ -209,6 +244,7 @@ export function CertHoverList({ certificates }: CertHoverListProps) {
                   onClick={() => setIsModalOpen(false)}
                 />
 
+                {/* Content Container */}
                 <motion.div
                   initial={{ scale: 0.9, opacity: 0, y: 20 }}
                   animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -256,7 +292,7 @@ export function CertHoverList({ certificates }: CertHoverListProps) {
                       )}
                     </div>
 
-                    {/* Details */}
+                    {/* Description & Links */}
                     <div className="flex flex-col">
                       <div className="flex flex-wrap gap-2 mb-6">
                         <span className="px-3 py-1 rounded-full bg-foreground/5 border border-border text-[10px] uppercase font-bold tracking-widest text-muted/80">

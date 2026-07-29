@@ -16,6 +16,7 @@ export function SkillsManager() {
   const [name, setName] = useState("");
   const [icon, setIcon] = useState("SiReact");
   const [level, setLevel] = useState(80);
+  const [category, setCategory] = useState("Frontend");
   const [iconSearch, setIconSearch] = useState("");
 
   useEffect(() => {
@@ -33,6 +34,7 @@ export function SkillsManager() {
     setName("");
     setIcon("SiReact");
     setLevel(80);
+    setCategory("Frontend");
     setIconSearch("");
     setEditingId(null);
     setShowForm(false);
@@ -42,6 +44,7 @@ export function SkillsManager() {
     setName(skill.name);
     setIcon(skill.icon);
     setLevel(skill.level);
+    setCategory(skill.category || "Frontend");
     setEditingId(skill.id || null);
     setShowForm(true);
   };
@@ -62,7 +65,7 @@ export function SkillsManager() {
       return;
     }
 
-    const data = { name: trimmedName, icon, level };
+    const data = { name: trimmedName, icon, level, category };
     try {
       if (editingId) {
         const result = await updateSkill(editingId, data);
@@ -179,6 +182,20 @@ export function SkillsManager() {
               </div>
 
               <div>
+                <label className="text-xs font-bold uppercase tracking-widest text-foreground/40 mb-1.5 block">Category</label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl bg-foreground/[0.03] border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/10 text-sm"
+                >
+                  <option value="Frontend">Frontend</option>
+                  <option value="Backend">Backend</option>
+                  <option value="Tools">Tools</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div>
                 <label className="text-xs font-bold uppercase tracking-widest text-foreground/40 mb-1.5 block">
                   Level: {level}%
                 </label>
@@ -223,6 +240,9 @@ export function SkillsManager() {
                   )}
               <div>
                     <p className="text-sm font-bold">{skill.name}</p>
+                    {skill.category && (
+                      <span className="text-[10px] uppercase tracking-wider text-muted/50 font-semibold">{skill.category}</span>
+                    )}
                     <div className="w-24 h-1.5 rounded-full bg-foreground/10 mt-1 overflow-hidden">
                       <div className="h-full rounded-full bg-foreground/40" style={{ width: `${skill.level}%` }} />
                     </div>

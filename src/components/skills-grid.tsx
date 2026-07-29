@@ -9,6 +9,7 @@ interface Skill {
     name: string;
     icon: IconType;
     level: number;
+    category?: string;
 }
 
 const categoryMap: Record<string, string> = {
@@ -60,30 +61,30 @@ const brandColors: Record<string, string> = {
 };
 
 const defaultSkills: Skill[] = [
-    { name: "HTML5", icon: getIcon("SiHtml5")!, level: 95 },
-    { name: "CSS3", icon: getIcon("SiCss3")!, level: 90 },
-    { name: "JavaScript", icon: getIcon("SiJavascript")!, level: 85 },
-    { name: "TypeScript", icon: getIcon("SiTypescript")!, level: 80 },
-    { name: "React", icon: getIcon("SiReact")!, level: 90 },
-    { name: "Next.js", icon: getIcon("SiNextdotjs")!, level: 85 },
-    { name: "Tailwind CSS", icon: getIcon("SiTailwindcss")!, level: 95 },
-    { name: "Framer Motion", icon: getIcon("SiFramer")!, level: 75 },
-    { name: "Vite", icon: getIcon("SiVite")!, level: 80 },
-    { name: "Node.js", icon: getIcon("SiNodedotjs")!, level: 75 },
-    { name: "Express", icon: getIcon("SiExpress")!, level: 80 },
-    { name: "MongoDB", icon: getIcon("SiMongodb")!, level: 70 },
-    { name: "PostgreSQL", icon: getIcon("SiPostgresql")!, level: 65 },
-    { name: "Firebase", icon: getIcon("SiFirebase")!, level: 75 },
-    { name: "JWT", icon: getIcon("SiJsonwebtokens")!, level: 90 },
-    { name: "Python", icon: getIcon("SiPython")!, level: 80 },
-    { name: "C++", icon: getIcon("SiCplusplus")!, level: 70 },
-    { name: "Git", icon: getIcon("SiGit")!, level: 85 },
-    { name: "GitHub", icon: getIcon("SiGithub")!, level: 85 },
-    { name: "Docker", icon: getIcon("SiDocker")!, level: 60 },
-    { name: "Figma", icon: getIcon("SiFigma")!, level: 70 },
+    { name: "HTML5", icon: getIcon("SiHtml5")!, level: 95, category: "Frontend" },
+    { name: "CSS3", icon: getIcon("SiCss3")!, level: 90, category: "Frontend" },
+    { name: "JavaScript", icon: getIcon("SiJavascript")!, level: 85, category: "Frontend" },
+    { name: "TypeScript", icon: getIcon("SiTypescript")!, level: 80, category: "Frontend" },
+    { name: "React", icon: getIcon("SiReact")!, level: 90, category: "Frontend" },
+    { name: "Next.js", icon: getIcon("SiNextdotjs")!, level: 85, category: "Frontend" },
+    { name: "Tailwind CSS", icon: getIcon("SiTailwindcss")!, level: 95, category: "Frontend" },
+    { name: "Framer Motion", icon: getIcon("SiFramer")!, level: 75, category: "Frontend" },
+    { name: "Vite", icon: getIcon("SiVite")!, level: 80, category: "Frontend" },
+    { name: "Node.js", icon: getIcon("SiNodedotjs")!, level: 75, category: "Backend" },
+    { name: "Express", icon: getIcon("SiExpress")!, level: 80, category: "Backend" },
+    { name: "MongoDB", icon: getIcon("SiMongodb")!, level: 70, category: "Backend" },
+    { name: "PostgreSQL", icon: getIcon("SiPostgresql")!, level: 65, category: "Backend" },
+    { name: "Firebase", icon: getIcon("SiFirebase")!, level: 75, category: "Backend" },
+    { name: "JWT", icon: getIcon("SiJsonwebtokens")!, level: 90, category: "Backend" },
+    { name: "Python", icon: getIcon("SiPython")!, level: 80, category: "Backend" },
+    { name: "C++", icon: getIcon("SiCplusplus")!, level: 70, category: "Backend" },
+    { name: "Git", icon: getIcon("SiGit")!, level: 85, category: "Tools" },
+    { name: "GitHub", icon: getIcon("SiGithub")!, level: 85, category: "Tools" },
+    { name: "Docker", icon: getIcon("SiDocker")!, level: 60, category: "Tools" },
+    { name: "Figma", icon: getIcon("SiFigma")!, level: 70, category: "Tools" },
 ];
 
-const categoryOrder = ["Frontend", "Backend", "Tools"];
+const categoryOrder = ["Frontend", "Backend", "Tools", "Other"];
 
 interface SkillsGridProps {
     initialSkills?: Skill[];
@@ -179,7 +180,7 @@ export function SkillsGrid({ initialSkills }: SkillsGridProps) {
     const grouped = useMemo(() => {
         const map = new Map<string, Skill[]>();
         for (const skill of skills) {
-            const cat = categoryMap[skill.name] || "Other";
+            const cat = skill.category || categoryMap[skill.name] || "Other";
             if (!map.has(cat)) map.set(cat, []);
             map.get(cat)!.push(skill);
         }

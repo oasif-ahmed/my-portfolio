@@ -70,7 +70,7 @@ const defaultProjects = [
 ];
 
 interface HomePageProps {
-  initialSkills?: { name: string; icon: string; level: number }[];
+  initialSkills?: { name: string; icon: string; level: number; category?: string }[];
   initialJourney?: { title: string; period: string; description: string; highlights?: string[]; icons: string[] }[];
   initialCertificates?: { title: string; issuer: string; date: string; image: string; credentialUrl?: string }[];
 }
@@ -147,6 +147,7 @@ export default function Home({ initialSkills, initialJourney, initialCertificate
           name: s.name,
           icon: getIcon(s.icon) || getIcon("SiReact")!,
           level: s.level,
+          category: s.category,
         }))}
       />
 

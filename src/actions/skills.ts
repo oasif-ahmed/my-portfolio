@@ -9,6 +9,7 @@ export interface Skill {
   name: string;
   icon: string;
   level: number;
+  category?: string;
 }
 
 const DB_NAME = "portfolio";
@@ -25,6 +26,7 @@ export async function getSkills() {
       name: s.name,
       icon: s.icon,
       level: s.level,
+      category: s.category,
     }));
   } catch (e) {
     console.error("Error fetching skills from MongoDB:", e);

@@ -4,27 +4,27 @@ import { getCertificates } from "@/actions/certificates";
 import Home from "./home-page";
 
 const defaultSkills = [
-    { name: "HTML5", icon: "SiHtml5", level: 95 },
-    { name: "CSS3", icon: "SiCss3", level: 90 },
-    { name: "JavaScript", icon: "SiJavascript", level: 85 },
-    { name: "TypeScript", icon: "SiTypescript", level: 80 },
-    { name: "React", icon: "SiReact", level: 90 },
-    { name: "Next.js", icon: "SiNextdotjs", level: 85 },
-    { name: "Tailwind CSS", icon: "SiTailwindcss", level: 95 },
-    { name: "Framer Motion", icon: "SiFramer", level: 75 },
-    { name: "Vite", icon: "SiVite", level: 80 },
-    { name: "Node.js", icon: "SiNodedotjs", level: 75 },
-    { name: "Express", icon: "SiExpress", level: 80 },
-    { name: "MongoDB", icon: "SiMongodb", level: 70 },
-    { name: "PostgreSQL", icon: "SiPostgresql", level: 65 },
-    { name: "Firebase", icon: "SiFirebase", level: 75 },
-    { name: "JWT", icon: "SiJsonwebtokens", level: 90 },
-    { name: "Python", icon: "SiPython", level: 80 },
-    { name: "C++", icon: "SiCplusplus", level: 70 },
-    { name: "Git", icon: "SiGit", level: 85 },
-    { name: "GitHub", icon: "SiGithub", level: 85 },
-    { name: "Docker", icon: "SiDocker", level: 60 },
-    { name: "Figma", icon: "SiFigma", level: 70 },
+    { name: "HTML5", icon: "SiHtml5", level: 95, category: "Frontend" },
+    { name: "CSS3", icon: "SiCss3", level: 90, category: "Frontend" },
+    { name: "JavaScript", icon: "SiJavascript", level: 85, category: "Frontend" },
+    { name: "TypeScript", icon: "SiTypescript", level: 80, category: "Frontend" },
+    { name: "React", icon: "SiReact", level: 90, category: "Frontend" },
+    { name: "Next.js", icon: "SiNextdotjs", level: 85, category: "Frontend" },
+    { name: "Tailwind CSS", icon: "SiTailwindcss", level: 95, category: "Frontend" },
+    { name: "Framer Motion", icon: "SiFramer", level: 75, category: "Frontend" },
+    { name: "Vite", icon: "SiVite", level: 80, category: "Frontend" },
+    { name: "Node.js", icon: "SiNodedotjs", level: 75, category: "Backend" },
+    { name: "Express", icon: "SiExpress", level: 80, category: "Backend" },
+    { name: "MongoDB", icon: "SiMongodb", level: 70, category: "Backend" },
+    { name: "PostgreSQL", icon: "SiPostgresql", level: 65, category: "Backend" },
+    { name: "Firebase", icon: "SiFirebase", level: 75, category: "Backend" },
+    { name: "JWT", icon: "SiJsonwebtokens", level: 90, category: "Backend" },
+    { name: "Python", icon: "SiPython", level: 80, category: "Backend" },
+    { name: "C++", icon: "SiCplusplus", level: 70, category: "Backend" },
+    { name: "Git", icon: "SiGit", level: 85, category: "Tools" },
+    { name: "GitHub", icon: "SiGithub", level: 85, category: "Tools" },
+    { name: "Docker", icon: "SiDocker", level: 60, category: "Tools" },
+    { name: "Figma", icon: "SiFigma", level: 70, category: "Tools" },
 ];
 
 const defaultJourney = [
@@ -39,7 +39,7 @@ export default async function Page() {
     let skills = await getSkills();
     if (!skills || skills.length === 0) {
         for (const s of defaultSkills) {
-            await addSkill({ name: s.name, icon: s.icon, level: s.level });
+            await addSkill({ name: s.name, icon: s.icon, level: s.level, category: s.category });
         }
         skills = defaultSkills.map(s => ({ id: "", ...s }));
     }
@@ -56,7 +56,7 @@ export default async function Page() {
 
     return (
         <Home
-            initialSkills={skills.map(s => ({ name: s.name, icon: s.icon, level: s.level }))}
+            initialSkills={skills.map(s => ({ name: s.name, icon: s.icon, level: s.level, category: s.category }))}
             initialJourney={journey.map(j => ({ title: j.title, period: j.period, description: j.description, highlights: j.highlights, icons: j.icons }))}
             initialCertificates={certificates?.map(c => ({ title: c.title, issuer: c.issuer, date: c.date, image: c.image, credentialUrl: c.credentialUrl })) || []}
         />
